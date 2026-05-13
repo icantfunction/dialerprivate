@@ -170,6 +170,157 @@
     .btn-import:hover { opacity: 0.85; }
     .btn-import:active { transform: scale(0.98); }
 
+    .btn-keypad {
+      width: 100%;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 16px;
+      background: transparent;
+      color: var(--sidebar-text);
+      border: 1px solid oklch(24% 0.012 250);
+      border-radius: var(--r-sm);
+      font-family: var(--font);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    }
+
+    .btn-keypad:hover {
+      background: oklch(19% 0.012 250);
+      border-color: oklch(32% 0.012 250);
+    }
+
+    .btn-keypad:active { transform: scale(0.98); }
+
+    /* Manual dial keypad */
+    .keypad-card { width: 360px; padding: 30px; }
+
+    .keypad-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      background: oklch(97% 0.005 60);
+      border: 1px solid var(--panel-border-2);
+      border-radius: var(--r-md);
+      margin-top: 4px;
+      margin-bottom: 16px;
+      min-height: 60px;
+    }
+
+    .keypad-num {
+      flex: 1;
+      font-size: 24px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: clip;
+      direction: ltr;
+    }
+
+    .keypad-num.empty { color: var(--text-muted); font-size: 14px; font-weight: 400; letter-spacing: 0; }
+
+    .keypad-backspace {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .keypad-backspace:hover { background: oklch(92% 0.006 60); color: var(--text-secondary); }
+
+    .keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .keypad-key {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      padding: 12px;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border-2);
+      border-radius: var(--r-md);
+      cursor: pointer;
+      transition: background 0.1s, transform 0.08s, border-color 0.1s;
+      font-family: var(--font);
+    }
+
+    .keypad-key:hover { background: var(--bg); border-color: oklch(82% 0.008 60); }
+    .keypad-key:active { transform: scale(0.96); }
+
+    .keypad-key .num {
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+
+    .keypad-key .letters {
+      font-size: 9.5px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      min-height: 11px;
+    }
+
+    .keypad-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .keypad-call-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 22px;
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: var(--r-full);
+      font-family: var(--font);
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 18px var(--green-glow);
+      transition: box-shadow 0.15s, transform 0.1s, background 0.15s, opacity 0.15s;
+    }
+
+    .keypad-call-btn:hover:not(:disabled) {
+      background: var(--green-dark);
+      box-shadow: 0 6px 26px var(--green-glow);
+      transform: translateY(-1px);
+    }
+
+    .keypad-call-btn:active:not(:disabled) { transform: scale(0.97); }
+
+    .keypad-call-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
     .list-header {
       padding: 14px 18px 6px;
       font-size: 10.5px;
@@ -1116,6 +1267,14 @@
         </svg>
         Import Contacts
       </button>
+      <button class="btn-keypad" onclick="openKeypad()" title="Open dial pad (manual call)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <circle cx="5" cy="5" r="1.6"/><circle cx="12" cy="5" r="1.6"/><circle cx="19" cy="5" r="1.6"/>
+          <circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>
+          <circle cx="5" cy="19" r="1.6"/><circle cx="12" cy="19" r="1.6"/><circle cx="19" cy="19" r="1.6"/>
+        </svg>
+        Keypad
+      </button>
     </div>
 
     <div class="list-header">
@@ -1266,6 +1425,44 @@
       <div class="modal-footer">
         <button class="btn-sample" onclick="loadSampleData()">Load sample contacts</button>
         <button class="btn-secondary" onclick="closeImport()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manual dial keypad -->
+  <div class="modal-overlay" id="keypad-overlay">
+    <div class="modal-card keypad-card">
+      <div class="modal-title">Manual Dial</div>
+      <div class="modal-sub">Enter a number to call. 10-digit US auto-formats; prefix with + for international.</div>
+
+      <div class="keypad-display">
+        <span class="keypad-num empty" id="keypad-num">Enter a number…</span>
+        <button class="keypad-backspace" onclick="keypadBackspace()" title="Backspace">⌫</button>
+      </div>
+
+      <div class="keypad-grid">
+        <button type="button" class="keypad-key" onclick="keypadPress('1')"><span class="num">1</span><span class="letters"></span></button>
+        <button type="button" class="keypad-key" onclick="keypadPress('2')"><span class="num">2</span><span class="letters">ABC</span></button>
+        <button type="button" class="keypad-key" onclick="keypadPress('3')"><span class="num">3</span><span class="letters">DEF</span></button>
+        <button type="button" class="keypad-key" onclick="keypadPress('4')"><span class="num">4</span><span class="letters">GHI</span></button>
+        <button type="button" class="keypad-key" onclick="keypadPress('5')"><span class="num">5</span><span class="letters">JKL</span></button>
+        <button type="button" class="keypad-key" onclick="keypadPress('6')"><span class="num">6</span><span class="letters">MNO</span></button>
+        <button type="button" class="keypad-key" onclick="keypadPress('7')"><span class="num">7</span><span class="letters">PQRS</span></button>
+        <button type="button" class="keypad-key" onclick="keypadPress('8')"><span class="num">8</span><span class="letters">TUV</span></button>
+        <button type="button" class="keypad-key" onclick="keypadPress('9')"><span class="num">9</span><span class="letters">WXYZ</span></button>
+        <button type="button" class="keypad-key" onclick="keypadPress('*')"><span class="num">*</span><span class="letters"></span></button>
+        <button type="button" class="keypad-key" onclick="keypadLongZero(event)"><span class="num">0</span><span class="letters">+</span></button>
+        <button type="button" class="keypad-key" onclick="keypadPress('#')"><span class="num">#</span><span class="letters"></span></button>
+      </div>
+
+      <div class="keypad-actions">
+        <button type="button" class="btn-secondary" onclick="closeKeypad()">Cancel</button>
+        <button type="button" class="keypad-call-btn" id="keypad-call-btn" onclick="keypadCall()" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6 19.79 19.79 0 0 1 1.61 5 2 2 0 0 1 3.6 2.81h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.4a16 16 0 0 0 6 6l.86-.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.03z"/>
+          </svg>
+          Call
+        </button>
       </div>
     </div>
   </div>
@@ -1821,8 +2018,14 @@
       save();
       renderCallHistory();
       renderList(document.getElementById('search').value);
-      showToast(`Call ended · ${dur} — set a disposition`);
-      if (!selected.disposition) promptDispositionAfterCall();
+
+      if (selected.manual) {
+        showToast(`Manual call ended · ${dur}`);
+        selected = null;
+      } else {
+        showToast(`Call ended · ${dur} — set a disposition`);
+        if (!selected.disposition) promptDispositionAfterCall();
+      }
     }
 
     function formatDur(s) {
@@ -1855,6 +2058,121 @@
 
     document.getElementById('import-overlay').addEventListener('click', e => {
       if (e.target === e.currentTarget) closeImport();
+    });
+
+    // ── Manual dial keypad ──────────────────────────────────
+    let keypadValue = '';
+    let zeroHoldTimer = null;
+
+    function openKeypad() {
+      keypadValue = '';
+      updateKeypadDisplay();
+      document.getElementById('keypad-overlay').classList.add('active');
+    }
+
+    function closeKeypad() {
+      document.getElementById('keypad-overlay').classList.remove('active');
+      clearTimeout(zeroHoldTimer);
+    }
+
+    function keypadPress(ch) {
+      if (keypadValue.length >= 20) return;
+      keypadValue += ch;
+      updateKeypadDisplay();
+    }
+
+    function keypadBackspace() {
+      keypadValue = keypadValue.slice(0, -1);
+      updateKeypadDisplay();
+    }
+
+    function keypadLongZero(e) {
+      // Tap = "0", hold = "+"
+      clearTimeout(zeroHoldTimer);
+      let inserted = false;
+      zeroHoldTimer = setTimeout(() => {
+        if (keypadValue.length < 20) {
+          keypadValue += '+';
+          updateKeypadDisplay();
+          inserted = true;
+        }
+      }, 500);
+      const finish = () => {
+        clearTimeout(zeroHoldTimer);
+        if (!inserted) keypadPress('0');
+        document.removeEventListener('mouseup', finish);
+        document.removeEventListener('touchend', finish);
+      };
+      document.addEventListener('mouseup', finish, { once: true });
+      document.addEventListener('touchend', finish, { once: true });
+    }
+
+    function formatKeypadDisplay(s) {
+      if (!s) return '';
+      if (s.startsWith('+')) return s;
+      const d = s.replace(/\D/g, '');
+      if (d.length <= 3) return d;
+      if (d.length <= 6) return `(${d.slice(0,3)}) ${d.slice(3)}`;
+      if (d.length <= 10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
+      if (d.length === 11 && d.startsWith('1')) return `+1 (${d.slice(1,4)}) ${d.slice(4,7)}-${d.slice(7)}`;
+      return `+${d}`;
+    }
+
+    function isKeypadCallable(s) {
+      if (!s) return false;
+      if (s.startsWith('+')) return /^\+[1-9]\d{6,14}$/.test(s);
+      const d = s.replace(/\D/g, '');
+      return d.length === 10 || (d.length === 11 && d.startsWith('1'));
+    }
+
+    function updateKeypadDisplay() {
+      const numEl = document.getElementById('keypad-num');
+      const btn = document.getElementById('keypad-call-btn');
+      const formatted = formatKeypadDisplay(keypadValue);
+      if (formatted) {
+        numEl.textContent = formatted;
+        numEl.classList.remove('empty');
+      } else {
+        numEl.textContent = 'Enter a number…';
+        numEl.classList.add('empty');
+      }
+      if (btn) btn.disabled = !isKeypadCallable(keypadValue);
+    }
+
+    function keypadCall() {
+      if (!isKeypadCallable(keypadValue)) return;
+      const phone = keypadValue.trim();
+      closeKeypad();
+      startManualCall(phone);
+    }
+
+    function startManualCall(rawPhone) {
+      const phone = String(rawPhone || '').trim();
+      if (!phone) return;
+      selected = {
+        id: '__manual__',
+        name: 'Manual Call',
+        phone,
+        manual: true,
+        notes: '',
+        calls: [],
+        disposition: '',
+        callbackAt: ''
+      };
+      startCall();
+    }
+
+    document.getElementById('keypad-overlay').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeKeypad();
+    });
+
+    document.addEventListener('keydown', e => {
+      const open = document.getElementById('keypad-overlay').classList.contains('active');
+      if (!open) return;
+      if (e.key === 'Escape') { e.preventDefault(); return closeKeypad(); }
+      if (e.key === 'Enter')  { e.preventDefault(); return keypadCall(); }
+      if (e.key === 'Backspace') { e.preventDefault(); return keypadBackspace(); }
+      if (/^[0-9*#+]$/.test(e.key)) { e.preventDefault(); return keypadPress(e.key); }
     });
 
     function onDragOver(e) {
