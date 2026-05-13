@@ -250,6 +250,143 @@
       flex-shrink: 0;
     }
 
+    /* Disposition system */
+    .dispo-pip {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 2px oklch(13% 0.015 250);
+    }
+
+    .dispo-header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 12px 4px 9px;
+      border-radius: var(--r-full);
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: white;
+      margin-top: 8px;
+      box-shadow: 0 2px 10px var(--dispo-color, oklch(50% 0.1 250 / 0.25));
+      background: var(--dispo-color, var(--text-secondary));
+    }
+
+    .dispo-header-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: white;
+      opacity: 0.85;
+    }
+
+    .dispo-section {
+      transition: box-shadow 0.4s, transform 0.4s;
+      border-radius: var(--r-md);
+      padding: 4px;
+      margin: -4px;
+    }
+
+    .dispo-section.prompt {
+      box-shadow: 0 0 0 2px var(--green-glow);
+      animation: dispoPulse 1.6s ease-out 2;
+    }
+
+    @keyframes dispoPulse {
+      0%, 100% { box-shadow: 0 0 0 2px oklch(60% 0.22 145 / 0); }
+      50%      { box-shadow: 0 0 0 4px oklch(60% 0.22 145 / 0.35); }
+    }
+
+    .dispo-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .dispo-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 14px 7px 11px;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border-2);
+      border-radius: var(--r-full);
+      font-family: var(--font);
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: transform 0.12s, box-shadow 0.15s, border-color 0.15s, background 0.15s, color 0.15s;
+    }
+
+    .dispo-chip:hover {
+      transform: translateY(-1px);
+      border-color: oklch(72% 0.01 250);
+    }
+
+    .dispo-chip .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--dispo-color);
+      flex-shrink: 0;
+      box-shadow: 0 0 0 2px white;
+    }
+
+    .dispo-chip.active {
+      background: var(--dispo-color);
+      border-color: transparent;
+      color: white;
+      box-shadow: 0 4px 16px var(--dispo-glow, oklch(50% 0.1 250 / 0.25));
+    }
+
+    .dispo-chip.active .dot {
+      background: white;
+      box-shadow: 0 0 0 2px var(--dispo-color);
+    }
+
+    .dispo-callback-row {
+      display: none;
+      gap: 8px;
+      margin-top: 12px;
+      align-items: center;
+    }
+
+    .dispo-callback-row.show { display: flex; }
+
+    .dispo-callback-row input {
+      padding: 8px 12px;
+      border: 1px solid var(--panel-border-2);
+      border-radius: var(--r-sm);
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--text-primary);
+      background: var(--panel-bg);
+      outline: none;
+    }
+
+    .dispo-callback-row input:focus { border-color: var(--blue); }
+
+    .dispo-callback-row label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .dispo-clear {
+      background: none;
+      border: none;
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: var(--r-sm);
+    }
+
+    .dispo-clear:hover { color: var(--red); }
+
     .no-contacts {
       padding: 24px 14px;
       text-align: center;
@@ -892,6 +1029,9 @@
         <div class="d-info">
           <div class="d-name" id="d-name"></div>
           <div class="d-company" id="d-company"></div>
+          <div class="dispo-header-badge" id="d-dispo-badge" style="display:none;">
+            <span class="dot"></span><span id="d-dispo-label"></span>
+          </div>
           <div class="d-phone" id="d-phone">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6 19.79 19.79 0 0 1 1.61 5 2 2 0 0 1 3.6 2.81h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.4a16 16 0 0 0 6 6l.86-.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.03z"/>
@@ -914,6 +1054,17 @@
         <div>
           <div class="section-label">Call History</div>
           <div class="call-chips" id="call-chips"></div>
+        </div>
+        <div class="dispo-section" id="dispo-section">
+          <div class="section-label" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>Disposition</span>
+            <button class="dispo-clear" id="dispo-clear" type="button" onclick="clearDisposition()" style="display:none;">clear</button>
+          </div>
+          <div class="dispo-chips" id="dispo-chips"></div>
+          <div class="dispo-callback-row" id="dispo-callback-row">
+            <label for="dispo-callback-at">Callback at</label>
+            <input type="datetime-local" id="dispo-callback-at" oninput="saveCallbackAt()">
+          </div>
         </div>
         <div>
           <div class="section-label">Notes</div>
@@ -1070,16 +1221,24 @@
         return;
       }
 
-      list.innerHTML = filtered.map(c => `
+      list.innerHTML = filtered.map(c => {
+        const d = getDisposition(c.disposition);
+        let pip = '';
+        if (d) {
+          pip = `<div class="dispo-pip" style="background:${d.color}" title="${esc(d.label)}"></div>`;
+        } else if (c.called) {
+          pip = '<div class="called-pip" title="Called"></div>';
+        }
+        return `
         <div class="contact-item${selected && selected.id === c.id ? ' active' : ''}" onclick="selectContact('${c.id}')">
           <div class="c-avatar" style="background:${avatarColor(c.name)}">${esc(initials(c.name))}</div>
           <div class="c-meta">
             <div class="c-name">${esc(c.name)}</div>
             <div class="c-phone">${esc(c.phone || '—')}</div>
           </div>
-          ${c.called ? '<div class="called-pip" title="Called"></div>' : ''}
-        </div>
-      `).join('');
+          ${pip}
+        </div>`;
+      }).join('');
     }
 
     function filterContacts() {
@@ -1111,7 +1270,127 @@
       document.getElementById('notes-hint').textContent = '';
 
       renderCallHistory();
+      renderDispositions();
       renderList(document.getElementById('search').value);
+    }
+
+    // ── Dispositions ────────────────────────────────────────
+    // Derived from the David Ramos Widow Leads CSV outcomes plus standard
+    // follow-up states used in the same workflow.
+    const DISPOSITIONS = [
+      { key: 'closed',         label: 'Closed',         color: 'oklch(58% 0.22 145)' },
+      { key: 'callback',       label: 'Callback',       color: 'oklch(62% 0.18 220)' },
+      { key: 'not_interested', label: 'Not Interested', color: 'oklch(58% 0.22 25)'  },
+      { key: 'broke',          label: 'Broke',          color: 'oklch(68% 0.16 70)'  },
+      { key: 'voicemail',      label: 'Voicemail',      color: 'oklch(60% 0.10 290)' },
+      { key: 'attempt_1',      label: 'Attempt 1',      color: 'oklch(72% 0.02 250)' },
+      { key: 'attempt_2',      label: 'Attempt 2',      color: 'oklch(55% 0.03 250)' },
+      { key: 'attempt_3',      label: 'Attempt 3',      color: 'oklch(35% 0.04 250)' },
+      { key: 'bad_number',     label: 'Bad Number',     color: 'oklch(50% 0.08 30)'  },
+      { key: 'dnc',            label: 'Do Not Call',    color: 'oklch(35% 0.20 25)'  },
+    ];
+
+    function getDisposition(key) {
+      return DISPOSITIONS.find(d => d.key === key) || null;
+    }
+
+    function inferDisposition(text) {
+      if (!text) return '';
+      const t = String(text).toLowerCase().trim();
+      if (!t) return '';
+      if (/closed|sale|sold/.test(t)) return 'closed';
+      if (/not\s*interested|not_interested|decline/.test(t)) return 'not_interested';
+      if (/call\s*back|callback|said\s*cb|cb\b|busy/.test(t)) return 'callback';
+      if (/broke|cant\s*afford|can't\s*afford|no\s*money/.test(t)) return 'broke';
+      if (/voicemail|vm\b|left\s*message/.test(t)) return 'voicemail';
+      if (/attempt\s*3|3x.*3|att\s*3/.test(t)) return 'attempt_3';
+      if (/attempt\s*2|3x.*2|att\s*2/.test(t)) return 'attempt_2';
+      if (/attempt\s*1|3x.*1|att\s*1|no\s*answer/.test(t)) return 'attempt_1';
+      if (/bad\s*number|invalid|disconnect/.test(t)) return 'bad_number';
+      if (/dnc|do\s*not\s*call/.test(t)) return 'dnc';
+      return '';
+    }
+
+    function renderDispositions() {
+      const el = document.getElementById('dispo-chips');
+      if (!el) return;
+      const current = selected ? selected.disposition : '';
+      el.innerHTML = DISPOSITIONS.map(d => `
+        <button type="button"
+                class="dispo-chip${current === d.key ? ' active' : ''}"
+                style="--dispo-color:${d.color};--dispo-glow:${d.color.replace(')', ' / 0.35)')}"
+                onclick="setDisposition('${d.key}')">
+          <span class="dot"></span>${esc(d.label)}
+        </button>
+      `).join('');
+
+      // Header badge
+      const badge = document.getElementById('d-dispo-badge');
+      const label = document.getElementById('d-dispo-label');
+      const dispo = getDisposition(current);
+      if (dispo) {
+        badge.style.display = 'inline-flex';
+        badge.style.setProperty('--dispo-color', dispo.color);
+        label.textContent = dispo.label;
+      } else {
+        badge.style.display = 'none';
+      }
+
+      // Callback datetime input
+      const cbRow = document.getElementById('dispo-callback-row');
+      const cbInput = document.getElementById('dispo-callback-at');
+      if (current === 'callback') {
+        cbRow.classList.add('show');
+        cbInput.value = selected && selected.callbackAt ? selected.callbackAt : '';
+      } else {
+        cbRow.classList.remove('show');
+      }
+
+      // Clear button
+      document.getElementById('dispo-clear').style.display = current ? 'inline' : 'none';
+    }
+
+    function setDisposition(key) {
+      if (!selected) return;
+      selected.disposition = key;
+      const c = contacts.find(x => x.id === selected.id);
+      if (c) c.disposition = key;
+      save();
+      renderDispositions();
+      renderList(document.getElementById('search').value);
+      const d = getDisposition(key);
+      if (d) showToast(`Disposition: ${d.label}`);
+    }
+
+    function clearDisposition() {
+      if (!selected) return;
+      selected.disposition = '';
+      selected.callbackAt = '';
+      const c = contacts.find(x => x.id === selected.id);
+      if (c) { c.disposition = ''; c.callbackAt = ''; }
+      save();
+      renderDispositions();
+      renderList(document.getElementById('search').value);
+      showToast('Disposition cleared');
+    }
+
+    function saveCallbackAt() {
+      if (!selected) return;
+      const v = document.getElementById('dispo-callback-at').value;
+      selected.callbackAt = v;
+      const c = contacts.find(x => x.id === selected.id);
+      if (c) c.callbackAt = v;
+      save();
+    }
+
+    function promptDispositionAfterCall() {
+      const section = document.getElementById('dispo-section');
+      if (!section) return;
+      section.classList.remove('prompt');
+      void section.offsetWidth; // reflow to restart animation
+      section.classList.add('prompt');
+      section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => section.classList.remove('prompt'), 3400);
     }
 
     function renderCallHistory() {
@@ -1289,7 +1568,8 @@
       save();
       renderCallHistory();
       renderList(document.getElementById('search').value);
-      showToast(`Call ended · ${dur}`);
+      showToast(`Call ended · ${dur} — set a disposition`);
+      if (!selected.disposition) promptDispositionAfterCall();
     }
 
     function formatDur(s) {
@@ -1354,11 +1634,17 @@
 
     function parseCSV(text) {
       const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-      if (lines.length < 2) { showToast('CSV appears empty.'); return; }
+      if (lines.length < 1) { showToast('CSV appears empty.'); return; }
 
-      const header = parseLine(lines[0]).map(h =>
-        h.toLowerCase().replace(/[^a-z0-9]/g, '')
-      );
+      // Detect headerless CSVs (e.g. widow-leads format) by checking if
+      // column 2 of row 0 looks like a phone number.
+      const firstCols = parseLine(lines[0]);
+      const looksLikePhone = v => /^\+?\d[\d\s().-]{7,}$/.test(String(v || '').trim());
+      const hasHeader = !looksLikePhone(firstCols[1]);
+
+      const header = hasHeader
+        ? firstCols.map(h => h.toLowerCase().replace(/[^a-z0-9]/g, ''))
+        : [];
 
       const col = (keys) => {
         for (const k of keys) {
@@ -1374,30 +1660,65 @@
       const phoneIdx   = col(['phone','mobile','tel','cell','number']);
       const emailIdx   = col(['email','mail']);
       const companyIdx = col(['company','org','organization','employer','business']);
+      const stateIdx   = col(['state','region']);
+      const branchIdx  = col(['branch','military']);
+      const ageIdx     = col(['age']);
+      const dispoIdx   = col(['disposition','dispo','status','outcome']);
+
+      // Headerless widow-leads positional layout:
+      //   0:name 1:phone 2:email 3:state 4:qualified 5:branch 6:relation 7:age 8:disposition 9:notes
+      const HL_NAME = 0, HL_PHONE = 1, HL_EMAIL = 2, HL_STATE = 3,
+            HL_BRANCH = 5, HL_AGE = 7, HL_DISPO = 8, HL_NOTES = 9;
 
       let added = 0;
-      for (let i = 1; i < lines.length; i++) {
+      const startIdx = hasHeader ? 1 : 0;
+      for (let i = startIdx; i < lines.length; i++) {
         const cols = parseLine(lines[i]);
         let name = '';
 
-        if (nameIdx >= 0 && cols[nameIdx]) {
-          name = cols[nameIdx].trim();
-        } else if (firstIdx >= 0 || lastIdx >= 0) {
-          name = [cols[firstIdx] || '', cols[lastIdx] || ''].join(' ').trim();
+        if (hasHeader) {
+          if (nameIdx >= 0 && cols[nameIdx]) name = cols[nameIdx].trim();
+          else if (firstIdx >= 0 || lastIdx >= 0)
+            name = [cols[firstIdx] || '', cols[lastIdx] || ''].join(' ').trim();
+          else name = (cols[0] || '').trim();
         } else {
-          name = (cols[0] || '').trim();
+          name = (cols[HL_NAME] || '').trim();
         }
 
         if (!name) continue;
 
-        const phone   = (phoneIdx   >= 0 ? cols[phoneIdx]   : cols[1] || '').trim();
-        const email   = (emailIdx   >= 0 ? cols[emailIdx]   : cols[2] || '').trim();
-        const company = (companyIdx >= 0 ? cols[companyIdx] : cols[3] || '').trim();
+        const phone = hasHeader
+          ? (phoneIdx >= 0 ? cols[phoneIdx] : cols[1] || '').trim()
+          : (cols[HL_PHONE] || '').trim();
+        const email = hasHeader
+          ? (emailIdx >= 0 ? cols[emailIdx] : cols[2] || '').trim()
+          : (cols[HL_EMAIL] || '').trim();
+        const company = hasHeader
+          ? (companyIdx >= 0 ? cols[companyIdx] : cols[3] || '').trim()
+          : '';
+
+        // Extra metadata
+        const state  = hasHeader ? (stateIdx  >= 0 ? cols[stateIdx]  : '') : (cols[HL_STATE]  || '');
+        const branch = hasHeader ? (branchIdx >= 0 ? cols[branchIdx] : '') : (cols[HL_BRANCH] || '');
+        const age    = hasHeader ? (ageIdx    >= 0 ? cols[ageIdx]    : '') : (cols[HL_AGE]    || '');
+        const dispoText = hasHeader ? (dispoIdx >= 0 ? cols[dispoIdx] : '') : (cols[HL_DISPO] || '');
+        const importedNote = hasHeader ? '' : (cols[HL_NOTES] || '');
+        const disposition = inferDisposition(dispoText);
 
         contacts.push({
           id: crypto.randomUUID(),
-          name, phone, email, company,
-          notes: '', called: false, calls: []
+          name,
+          phone,
+          email,
+          company,
+          state: (state || '').trim(),
+          branch: (branch || '').trim(),
+          age: (age || '').trim(),
+          notes: importedNote.trim(),
+          disposition,
+          callbackAt: '',
+          called: !!disposition,
+          calls: []
         });
         added++;
       }
@@ -1431,7 +1752,7 @@
         { name: 'Drew Hollis',    phone: '(555) 852-9930', email: 'drew.hollis@example.com',   company: '' },
         { name: 'Quinn Nakamura', phone: '(555) 963-1177', email: 'quinn.n@example.com',       company: 'Summit Tech' },
       ];
-      samples.forEach(s => contacts.push({ ...s, id: crypto.randomUUID(), notes: '', called: false, calls: [] }));
+      samples.forEach(s => contacts.push({ ...s, id: crypto.randomUUID(), notes: '', called: false, calls: [], disposition: '', callbackAt: '' }));
       save();
       renderList();
       closeImport();
