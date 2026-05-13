@@ -2584,6 +2584,76 @@
       }, 600);
     }
 
+    // ── Ring-back tone (US standard: 440+480 Hz, 2s on / 4s off) ───
+    // Connect's outbound voice contact gives the agent no audio until the
+    // customer answers, so we synthesize a ringback locally so you can
+    // tell the call is dialing.
+    let ringbackCtx = null;
+    let ringbackOscA = null;
+    let ringbackOscB = null;
+    let ringbackGain = null;
+    let ringbackTimer = null;
+
+    function startRingback() {
+      stopRingback();
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        const ctx = new Ctx();
+        // If the context is suspended (autoplay policy), try to resume on
+        // the user gesture that opened the call.
+        if (ctx.state === 'suspended' && typeof ctx.resume === 'function') {
+          ctx.resume().catch(() => {});
+        }
+
+        const gain = ctx.createGain();
+        gain.gain.value = 0;
+        gain.connect(ctx.destination);
+
+        const oscA = ctx.createOscillator();
+        oscA.type = 'sine'; oscA.frequency.value = 440; oscA.connect(gain);
+        const oscB = ctx.createOscillator();
+        oscB.type = 'sine'; oscB.frequency.value = 480; oscB.connect(gain);
+        oscA.start(); oscB.start();
+
+        ringbackCtx = ctx;
+        ringbackOscA = oscA;
+        ringbackOscB = oscB;
+        ringbackGain = gain;
+
+        const cycle = () => {
+          if (!ringbackCtx || !ringbackGain) return;
+          const now = ringbackCtx.currentTime;
+          const g = ringbackGain.gain;
+          g.cancelScheduledValues(now);
+          g.setValueAtTime(0.0, now);
+          g.linearRampToValueAtTime(0.16, now + 0.05); // fade in
+          g.setValueAtTime(0.16, now + 1.95);
+          g.linearRampToValueAtTime(0.0, now + 2.0);   // fade out (2s on)
+          // silent 4s until next cycle
+        };
+        cycle();
+        ringbackTimer = setInterval(cycle, 6000); // 2s on + 4s off = 6s
+      } catch (e) {
+        console.warn('Ringback failed to start:', e);
+      }
+    }
+
+    function stopRingback() {
+      clearInterval(ringbackTimer);
+      ringbackTimer = null;
+      try {
+        if (ringbackGain) {
+          ringbackGain.gain.cancelScheduledValues(0);
+          ringbackGain.gain.value = 0;
+        }
+      } catch (e) {}
+      try { if (ringbackOscA) ringbackOscA.stop(); } catch (e) {}
+      try { if (ringbackOscB) ringbackOscB.stop(); } catch (e) {}
+      try { if (ringbackCtx)  ringbackCtx.close();  } catch (e) {}
+      ringbackOscA = ringbackOscB = ringbackGain = ringbackCtx = null;
+    }
+
     async function placeRealCall(phone, contactId, name) {
       try {
         const res = await fetch(CALL_API, {
@@ -2658,6 +2728,7 @@
       activeCall = null;
 
       document.getElementById('call-overlay').classList.add('active');
+      startRingback();
 
       const result = await placeRealCall(selected.phone, selected.id, selected.name);
       if (result?.sourcePhoneNumber) {
@@ -2682,6 +2753,7 @@
 
     async function endCall() {
       const contactIdToStop = activeCall?.contactId || null;
+      stopRingback();
       document.getElementById('call-overlay').classList.remove('active');
       clearInterval(timerInterval);
       clearTimeout(connectDelayTimeout);
@@ -3196,6 +3268,9 @@
         window.streamsContact = contact;
 
         contact.onIncoming(() => {
+          // Customer answered and the contact is being routed to us — kill
+          // the synthetic ringback so the real audio comes through clean.
+          stopRingback();
           contact.accept({
             success: () => console.log('Contact auto-accepted by dialer'),
             failure: e => console.warn('Auto-accept failed:', e),
@@ -3203,11 +3278,13 @@
         });
 
         contact.onConnecting(() => {
+          stopRingback();
           const lbl = document.getElementById('call-status-label');
           if (lbl) lbl.textContent = 'Connecting…';
         });
 
         contact.onConnected(() => {
+          stopRingback();
           const lbl = document.getElementById('call-status-label');
           if (lbl) lbl.textContent = 'Connected';
           clearTimeout(connectDelayTimeout);
@@ -3223,6 +3300,7 @@
         });
 
         contact.onEnded(() => {
+          stopRingback();
           window.streamsContact = null;
           const overlay = document.getElementById('call-overlay');
           if (overlay && overlay.classList.contains('active')) {
