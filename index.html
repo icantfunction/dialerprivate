@@ -1221,50 +1221,52 @@
 
     .call-overlay {
       position: fixed;
-      inset: 0;
-      background: oklch(8% 0.02 250 / 0.88);
-      backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      bottom: 22px;
+      left: 22px;
+      background: transparent;
+      backdrop-filter: none;
       z-index: 100;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.25s;
+      transform: translateY(18px);
+      transition: opacity 0.25s, transform 0.25s;
     }
 
     .call-overlay.active {
       opacity: 1;
-      pointer-events: all;
+      pointer-events: none; /* card itself takes events */
+      transform: translateY(0);
     }
 
     .call-card {
       background: oklch(16% 0.015 250);
       border: 1px solid oklch(25% 0.015 250);
-      border-radius: 28px;
-      padding: 52px 60px 44px;
+      border-radius: 22px;
+      padding: 26px 32px 22px;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 14px;
-      min-width: 300px;
+      gap: 10px;
+      min-width: 280px;
+      box-shadow: 0 22px 60px oklch(0% 0 0 / 0.40);
+      pointer-events: auto;
     }
 
     .ring-wrap {
       position: relative;
-      width: 130px;
-      height: 130px;
+      width: 90px;
+      height: 90px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .ring-pulse {
       position: absolute;
-      width: 90px;
-      height: 90px;
+      width: 64px;
+      height: 64px;
       border-radius: 50%;
       background: var(--green);
       opacity: 0;
@@ -1280,13 +1282,13 @@
 
     .ring-avatar {
       position: relative;
-      width: 90px;
-      height: 90px;
+      width: 64px;
+      height: 64px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 30px;
+      font-size: 22px;
       font-weight: 600;
       color: white;
       z-index: 2;
@@ -1294,31 +1296,31 @@
     }
 
     .call-name-label {
-      font-size: 21px;
+      font-size: 17px;
       font-weight: 600;
       color: white;
       letter-spacing: -0.3px;
     }
 
     .call-phone-label {
-      font-size: 13px;
+      font-size: 12px;
       color: oklch(60% 0.01 250);
-      margin-top: -4px;
+      margin-top: -2px;
     }
 
     .call-status-label {
-      font-size: 13px;
+      font-size: 12px;
       color: oklch(65% 0.01 250);
       letter-spacing: 0.02em;
     }
 
     .call-timer {
-      font-size: 36px;
+      font-size: 24px;
       font-weight: 300;
       color: white;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
       font-variant-numeric: tabular-nums;
-      min-height: 44px;
+      min-height: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -2593,6 +2595,8 @@
     let ringbackOscB = null;
     let ringbackGain = null;
     let ringbackTimer = null;
+    let ringbackMaxTimer = null;
+    const RINGBACK_MAX_MS = 35000; // US carrier typical ring-to-VM window
 
     function startRingback() {
       stopRingback();
@@ -2600,8 +2604,6 @@
         const Ctx = window.AudioContext || window.webkitAudioContext;
         if (!Ctx) return;
         const ctx = new Ctx();
-        // If the context is suspended (autoplay policy), try to resume on
-        // the user gesture that opened the call.
         if (ctx.state === 'suspended' && typeof ctx.resume === 'function') {
           ctx.resume().catch(() => {});
         }
@@ -2627,13 +2629,21 @@
           const g = ringbackGain.gain;
           g.cancelScheduledValues(now);
           g.setValueAtTime(0.0, now);
-          g.linearRampToValueAtTime(0.16, now + 0.05); // fade in
+          g.linearRampToValueAtTime(0.16, now + 0.05);
           g.setValueAtTime(0.16, now + 1.95);
-          g.linearRampToValueAtTime(0.0, now + 2.0);   // fade out (2s on)
-          // silent 4s until next cycle
+          g.linearRampToValueAtTime(0.0, now + 2.0);
         };
         cycle();
-        ringbackTimer = setInterval(cycle, 6000); // 2s on + 4s off = 6s
+        ringbackTimer = setInterval(cycle, 6000);
+
+        ringbackMaxTimer = setTimeout(() => {
+          stopRingback();
+          const lbl = document.getElementById('call-status-label');
+          if (lbl && /Calling|Connecting/i.test(lbl.textContent)) {
+            lbl.textContent = 'No answer yet…';
+          }
+          showToast('No answer yet — hang up or keep waiting');
+        }, RINGBACK_MAX_MS);
       } catch (e) {
         console.warn('Ringback failed to start:', e);
       }
@@ -2642,6 +2652,8 @@
     function stopRingback() {
       clearInterval(ringbackTimer);
       ringbackTimer = null;
+      clearTimeout(ringbackMaxTimer);
+      ringbackMaxTimer = null;
       try {
         if (ringbackGain) {
           ringbackGain.gain.cancelScheduledValues(0);
