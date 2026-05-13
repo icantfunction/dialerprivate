@@ -402,6 +402,123 @@
       overflow: hidden;
     }
 
+    .setup-banner {
+      margin: 18px 24px 0;
+      padding: 16px 18px;
+      border-radius: 16px;
+      border: 1px solid oklch(88% 0.012 220);
+      background:
+        linear-gradient(135deg, oklch(98% 0.01 220), oklch(96% 0.018 210));
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      box-shadow: 0 10px 28px oklch(75% 0.04 220 / 0.14);
+      flex-wrap: wrap;
+    }
+
+    .setup-banner.hidden { display: none; }
+
+    .setup-banner.live {
+      border-color: oklch(82% 0.1 145);
+      background:
+        linear-gradient(135deg, oklch(98% 0.015 145), oklch(96% 0.03 150));
+      box-shadow: 0 10px 28px oklch(70% 0.05 145 / 0.14);
+    }
+
+    .setup-copy {
+      min-width: 260px;
+      flex: 1;
+    }
+
+    .setup-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 10px;
+      border-radius: var(--r-full);
+      background: white;
+      border: 1px solid oklch(90% 0.01 220);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      margin-bottom: 10px;
+    }
+
+    .setup-pill::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--blue);
+      box-shadow: 0 0 0 5px oklch(90% 0.02 220 / 0.55);
+    }
+
+    .setup-banner.live .setup-pill::before {
+      background: var(--green);
+      box-shadow: 0 0 0 5px oklch(90% 0.03 145 / 0.7);
+    }
+
+    .setup-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.25px;
+    }
+
+    .setup-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-top: 4px;
+      max-width: 760px;
+    }
+
+    .setup-note {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      line-height: 1.55;
+    }
+
+    .setup-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+
+    .setup-btn {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid oklch(87% 0.008 220);
+      background: white;
+      color: var(--text-primary);
+      font-family: var(--font);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.15s, border-color 0.15s;
+    }
+
+    .setup-btn:hover {
+      background: oklch(99% 0.004 220);
+      border-color: oklch(80% 0.03 220);
+    }
+
+    .setup-btn:active { transform: scale(0.98); }
+
+    .setup-btn-primary {
+      background: var(--blue);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 8px 22px oklch(62% 0.18 220 / 0.22);
+    }
+
+    .setup-btn-primary:hover { background: oklch(58% 0.18 220); }
+
     .empty-state {
       flex: 1;
       display: flex;
@@ -1013,6 +1130,20 @@
 
   <main class="main">
 
+    <div class="setup-banner" id="connect-help">
+      <div class="setup-copy">
+        <div class="setup-pill" id="connect-help-pill">Waiting for Connect sign-in</div>
+        <div class="setup-title" id="connect-help-title">Finish Amazon Connect setup</div>
+        <div class="setup-text" id="connect-help-text">Open the CCP, sign in, allow cookie access if prompted, then allow microphone access in that Amazon Connect window. Once the agent session is live, this banner will turn green.</div>
+        <div class="setup-note" id="connect-help-note">If the popup closes too early or Chrome blocks it, use Open CCP again and allow popups for this site.</div>
+      </div>
+      <div class="setup-actions">
+        <button class="setup-btn setup-btn-primary" type="button" onclick="openCcpLogin()">Open CCP</button>
+        <button class="setup-btn" type="button" onclick="testMicrophone()">Test microphone</button>
+        <button class="setup-btn" type="button" onclick="dismissConnectHelp()">Hide</button>
+      </div>
+    </div>
+
     <div class="empty-state" id="empty-state">
       <div class="empty-icon-ring">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
@@ -1155,6 +1286,7 @@
 
   <script>
     const runtimeConfig = window.DIALER_CONFIG || {};
+    const DEFAULT_CCP_URL = 'https://manualdialer20260414195157.my.connect.aws/ccp-v2/';
 
     // Backend endpoints for placing and stopping real calls via AWS Connect.
     // When the backend is unavailable, the UI falls back to the simulated call flow.
@@ -1173,8 +1305,15 @@
     let speakerOn = true;
     let currentContactId = null;
     let activeCall = null;
+    let connectHelpTimeout = null;
 
     const COLORS = [145, 220, 280, 340, 45, 185, 310, 260, 15, 165];
+    const SEEDED_TEST_CONTACT = {
+      name: 'Ramos Test Line',
+      phone: '(386) 307-6306',
+      email: 'ramosnco@gmail.com',
+      company: 'Dialer QA'
+    };
 
     function avatarColor(name) {
       let h = 0;
@@ -1190,10 +1329,124 @@
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
 
+    function normalizePhone(raw) {
+      const digits = String(raw || '').replace(/\D/g, '');
+      if (digits.length === 10) return `1${digits}`;
+      return digits;
+    }
+
+    function ensureSeedContacts() {
+      const exists = contacts.some(c =>
+        String(c.email || '').toLowerCase() === SEEDED_TEST_CONTACT.email.toLowerCase() ||
+        normalizePhone(c.phone) === normalizePhone(SEEDED_TEST_CONTACT.phone)
+      );
+
+      if (exists) return false;
+
+      contacts.unshift({
+        id: crypto.randomUUID(),
+        ...SEEDED_TEST_CONTACT,
+        notes: 'Built-in test contact for verifying outbound call audio and caller ID.',
+        called: false,
+        calls: [],
+        disposition: '',
+        callbackAt: ''
+      });
+      return true;
+    }
+
+    function getCcpUrl() {
+      return runtimeConfig.ccpUrl || window.CCP_URL || DEFAULT_CCP_URL;
+    }
+
+    function setConnectHelp({ title, text, note, pill, live = false, forceShow = false }) {
+      const banner = document.getElementById('connect-help');
+      if (!banner) return;
+
+      banner.classList.toggle('live', live);
+      document.getElementById('connect-help-title').textContent = title;
+      document.getElementById('connect-help-text').textContent = text;
+      document.getElementById('connect-help-note').textContent = note;
+      document.getElementById('connect-help-pill').textContent = pill;
+
+      if (forceShow) {
+        localStorage.removeItem('dialer_connect_help_hidden');
+        banner.classList.remove('hidden');
+      } else if (!localStorage.getItem('dialer_connect_help_hidden')) {
+        banner.classList.remove('hidden');
+      }
+    }
+
+    function dismissConnectHelp() {
+      localStorage.setItem('dialer_connect_help_hidden', '1');
+      document.getElementById('connect-help')?.classList.add('hidden');
+    }
+
+    function openCcpLogin() {
+      const popup = window.open(getCcpUrl(), 'dialer-connect-ccp', 'popup=yes,width=460,height=700');
+      if (!popup) {
+        setConnectHelp({
+          title: 'Popup was blocked',
+          text: 'Allow popups for this site, then click Open CCP again.',
+          note: 'After the popup opens, sign in and allow microphone access in that Amazon Connect window.',
+          pill: 'Popup blocked',
+          forceShow: true
+        });
+        showToast('Popup blocked. Allow popups for this site and retry.');
+        return;
+      }
+
+      try { popup.focus(); } catch (e) {}
+      document.getElementById('ccp-wrap')?.classList.remove('hidden');
+      setConnectHelp({
+        title: 'Finish sign-in in the Amazon Connect window',
+        text: 'In the popup, sign in, click Grant access for cookies if prompted, then allow microphone access when the browser asks.',
+        note: 'After access is granted, return to the dialer. The banner will switch to live once the agent session is connected.',
+        pill: 'CCP popup opened',
+        forceShow: true
+      });
+    }
+
+    async function testMicrophone() {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setConnectHelp({
+          title: 'Microphone test is not supported here',
+          text: 'This browser does not expose microphone testing APIs to the dialer page.',
+          note: 'Open the CCP directly and allow microphone access there instead.',
+          pill: 'Mic test unavailable',
+          forceShow: true
+        });
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(track => track.stop());
+        setConnectHelp({
+          title: 'Microphone is available in this browser tab',
+          text: 'Your device microphone is working for the dialer page. You may still need to allow microphone access separately in the Amazon Connect popup because that runs on a different origin.',
+          note: 'If the CCP still says microphone is inaccessible, allow the mic in the Amazon Connect popup and refresh that window.',
+          pill: 'Microphone allowed',
+          forceShow: true
+        });
+        showToast('Microphone works in this browser tab.');
+      } catch (error) {
+        setConnectHelp({
+          title: 'Microphone access is blocked',
+          text: 'Allow microphone access for this site in your browser, then try the test again. After that, open the CCP and allow microphone access there too.',
+          note: 'In Chrome, click the lock icon in the address bar, set Microphone to Allow, and refresh.',
+          pill: 'Microphone blocked',
+          forceShow: true
+        });
+        showToast('Microphone access is blocked in this browser.');
+      }
+    }
+
     function load() {
       try {
         const d = localStorage.getItem('dialer_v2');
         if (d) contacts = JSON.parse(d);
+        if (ensureSeedContacts()) save();
         renderList();
       } catch(e) { contacts = []; }
     }
@@ -1767,6 +2020,12 @@
     }
 
     load();
+    setConnectHelp({
+      title: 'Finish Amazon Connect setup',
+      text: 'Open the CCP, sign in, allow cookie access if prompted, then allow microphone access in that Amazon Connect window. Once the agent session is live, this banner will turn green.',
+      note: 'If the popup closes too early or Chrome blocks it, use Open CCP again and allow popups for this site.',
+      pill: 'Waiting for Connect sign-in'
+    });
 
     // ── Amazon Connect Streams (embedded CCP) ───────────────
     window.streamsAgent = null;
@@ -1775,12 +2034,16 @@
     function initStreamsCCP() {
       if (!window.connect || !window.connect.core) {
         console.warn('amazon-connect-streams did not load; skipping CCP embed.');
+        setConnectHelp({
+          title: 'Amazon Connect did not load',
+          text: 'The embedded CCP script did not initialize. Refresh the page and try opening the CCP again.',
+          note: 'If this persists, the browser may be blocking a required script or popup.',
+          pill: 'CCP unavailable',
+          forceShow: true
+        });
         return;
       }
-      const ccpUrl =
-        runtimeConfig.ccpUrl ||
-        window.CCP_URL ||
-        'https://manualdialer20260414195157.my.connect.aws/ccp-v2/';
+      const ccpUrl = getCcpUrl();
       try {
         connect.core.initCCP(document.getElementById('ccp-container'), {
           ccpUrl,
@@ -1795,11 +2058,32 @@
         });
       } catch (e) {
         console.warn('initCCP failed:', e);
+        setConnectHelp({
+          title: 'Amazon Connect failed to initialize',
+          text: 'The embedded CCP could not start. Use Open CCP to retry the login flow in a fresh window.',
+          note: 'If the browser blocked the popup, allow popups for this site and retry.',
+          pill: 'CCP init failed',
+          forceShow: true
+        });
         return;
       }
 
+      clearTimeout(connectHelpTimeout);
+      connectHelpTimeout = setTimeout(() => {
+        if (!window.streamsAgent) {
+          setConnectHelp({
+            title: 'Agent session is not live yet',
+            text: 'Use Open CCP, then sign in and allow microphone access in the Amazon Connect window.',
+            note: 'If you already signed in, refresh the CCP popup after granting mic access.',
+            pill: 'Still waiting',
+            forceShow: true
+          });
+        }
+      }, 5000);
+
       connect.agent(agent => {
         window.streamsAgent = agent;
+        clearTimeout(connectHelpTimeout);
         try {
           const states = agent.getAgentStates();
           const routable = states.find(s => s.type === connect.AgentStateType.ROUTABLE);
@@ -1810,6 +2094,14 @@
             });
           }
         } catch (e) { console.warn('Agent state init failed:', e); }
+        setConnectHelp({
+          title: 'Amazon Connect is live',
+          text: 'The agent session is connected and voice auto-accept is enabled. You can place calls from the dialer now.',
+          note: 'Use Open CCP anytime if you want to reopen the Amazon Connect window or inspect audio settings.',
+          pill: 'Agent connected',
+          live: true,
+          forceShow: true
+        });
         document.getElementById('ccp-wrap').classList.add('ready');
       });
 
