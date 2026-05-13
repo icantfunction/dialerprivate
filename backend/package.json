@@ -1,0 +1,19 @@
+{
+  "name": "dialer-connect-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "private": true,
+  "description": "AWS Connect backend for the dialer app",
+  "dependencies": {
+    "@aws-sdk/client-connect": "^3.922.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "serverless-http": "^3.2.0"
+  }
+}

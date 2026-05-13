@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dialer to Life Insurance</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:               oklch(98.5% 0.005 60);
+      --sidebar-bg:       oklch(13% 0.015 250);
+      --sidebar-hover:    oklch(18% 0.015 250);
+      --sidebar-active:   oklch(23% 0.018 250);
+      --sidebar-border:   oklch(21% 0.012 250);
+      --sidebar-text:     oklch(90% 0.008 250);
+      --sidebar-muted:    oklch(52% 0.01 250);
+
+      --panel-bg:         oklch(100% 0 0);
+      --panel-border:     oklch(93% 0.006 60);
+      --panel-border-2:   oklch(88% 0.008 60);
+
+      --text-primary:     oklch(18% 0.012 250);
+      --text-secondary:   oklch(48% 0.01 250);
+      --text-muted:       oklch(70% 0.006 60);
+
+      --green:            oklch(60% 0.22 145);
+      --green-dark:       oklch(50% 0.22 145);
+      --green-glow:       oklch(60% 0.22 145 / 0.28);
+      --red:              oklch(58% 0.22 25);
+      --blue:             oklch(62% 0.18 220);
+      --blue-light:       oklch(96% 0.01 220);
+
+      --r-sm: 8px; --r-md: 14px; --r-lg: 22px; --r-full: 9999px;
+      --sidebar-w: 288px;
+      --font: 'DM Sans', system-ui, sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      border-right: 1px solid var(--sidebar-border);
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .sidebar-gradient {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+
+    .sidebar-gradient::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        oklch(13% 0.015 250 / 0.15) 0%,
+        oklch(13% 0.015 250 / 0.55) 55%,
+        oklch(13% 0.015 250 / 0.85) 100%
+      );
+      pointer-events: none;
+    }
+
+    .sidebar-gradient canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+
+    .sidebar > .sidebar-top,
+    .sidebar > .sidebar-actions,
+    .sidebar > .list-header,
+    .sidebar > .contact-list {
+      position: relative;
+      z-index: 1;
+    }
+
+    .sidebar-top { padding: 26px 18px 16px; }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 18px;
+      font-weight: 600;
+      color: white;
+      letter-spacing: -0.4px;
+      margin-bottom: 16px;
+    }
+
+    .logo-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .search-wrap { position: relative; }
+
+    .search-ico {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--sidebar-muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      background: oklch(19% 0.012 250);
+      border: 1px solid oklch(24% 0.01 250);
+      border-radius: var(--r-sm);
+      padding: 8px 11px 8px 34px;
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--sidebar-text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .search-input::placeholder { color: var(--sidebar-muted); }
+    .search-input:focus { border-color: oklch(38% 0.015 250); }
+
+    .sidebar-actions {
+      padding: 0 18px 14px;
+      border-bottom: 1px solid var(--sidebar-border);
+    }
+
+    .btn-import {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 9px 16px;
+      background: var(--blue);
+      color: white;
+      border: none;
+      border-radius: var(--r-sm);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+
+    .btn-import:hover { opacity: 0.85; }
+    .btn-import:active { transform: scale(0.98); }
+
+    .list-header {
+      padding: 14px 18px 6px;
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--sidebar-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .contact-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 8px 12px;
+    }
+
+    .contact-list::-webkit-scrollbar { width: 4px; }
+    .contact-list::-webkit-scrollbar-track { background: transparent; }
+    .contact-list::-webkit-scrollbar-thumb {
+      background: oklch(26% 0.01 250);
+      border-radius: 2px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 9px 10px;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .contact-item:hover { background: var(--sidebar-hover); }
+    .contact-item.active { background: var(--sidebar-active); }
+
+    .c-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: white;
+      flex-shrink: 0;
+      letter-spacing: 0.02em;
+    }
+
+    .c-meta { flex: 1; min-width: 0; }
+
+    .c-name {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--sidebar-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .c-phone {
+      font-size: 11.5px;
+      color: var(--sidebar-muted);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .called-pip {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+    }
+
+    .no-contacts {
+      padding: 24px 14px;
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--sidebar-muted);
+      line-height: 1.6;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .empty-icon-ring {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      border: 1.5px dashed oklch(86% 0.008 60);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+    }
+
+    .empty-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .empty-sub {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      max-width: 260px;
+      line-height: 1.55;
+    }
+
+    .contact-detail {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .detail-header {
+      background: var(--panel-bg);
+      border-bottom: 1px solid var(--panel-border);
+      padding: 36px 48px 28px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .d-avatar {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 600;
+      color: white;
+      flex-shrink: 0;
+      letter-spacing: 0.02em;
+    }
+
+    .d-info { flex: 1; }
+
+    .d-name {
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.4px;
+      line-height: 1.15;
+    }
+
+    .d-company {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+      font-weight: 400;
+    }
+
+    .d-phone {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .d-email {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .d-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-call {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 26px;
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: var(--r-full);
+      font-family: var(--font);
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 18px var(--green-glow);
+      transition: box-shadow 0.15s, transform 0.1s, background 0.15s;
+    }
+
+    .btn-call:hover {
+      background: var(--green-dark);
+      box-shadow: 0 6px 26px var(--green-glow);
+      transform: translateY(-1px);
+    }
+
+    .btn-call:active { transform: scale(0.97); }
+
+    .detail-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .detail-body::-webkit-scrollbar { width: 4px; }
+    .detail-body::-webkit-scrollbar-track { background: transparent; }
+    .detail-body::-webkit-scrollbar-thumb {
+      background: oklch(88% 0.006 60);
+      border-radius: 2px;
+    }
+
+    .section-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .call-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .call-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border-2);
+      border-radius: var(--r-full);
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .chip-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+    }
+
+    .no-calls {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .notes-area {
+      width: 100%;
+      min-height: 148px;
+      padding: 14px 16px;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border-2);
+      border-radius: var(--r-md);
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--text-primary);
+      line-height: 1.65;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .notes-area::placeholder { color: var(--text-muted); }
+    .notes-area:focus { border-color: oklch(80% 0.01 250); }
+
+    .notes-save-hint {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .call-overlay {
+      position: fixed;
+      inset: 0;
+      background: oklch(8% 0.02 250 / 0.88);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+
+    .call-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .call-card {
+      background: oklch(16% 0.015 250);
+      border: 1px solid oklch(25% 0.015 250);
+      border-radius: 28px;
+      padding: 52px 60px 44px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      min-width: 300px;
+    }
+
+    .ring-wrap {
+      position: relative;
+      width: 130px;
+      height: 130px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 4px;
+    }
+
+    .ring-pulse {
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: var(--green);
+      opacity: 0;
+      animation: ringPulse 2.2s ease-out infinite;
+    }
+
+    .ring-pulse:nth-child(2) { animation-delay: 0.8s; }
+
+    @keyframes ringPulse {
+      0%   { transform: scale(1);   opacity: 0.35; }
+      100% { transform: scale(2.1); opacity: 0; }
+    }
+
+    .ring-avatar {
+      position: relative;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      font-weight: 600;
+      color: white;
+      z-index: 2;
+      letter-spacing: 0.02em;
+    }
+
+    .call-name-label {
+      font-size: 21px;
+      font-weight: 600;
+      color: white;
+      letter-spacing: -0.3px;
+    }
+
+    .call-phone-label {
+      font-size: 13px;
+      color: oklch(60% 0.01 250);
+      margin-top: -4px;
+    }
+
+    .call-status-label {
+      font-size: 13px;
+      color: oklch(65% 0.01 250);
+      letter-spacing: 0.02em;
+    }
+
+    .call-timer {
+      font-size: 36px;
+      font-weight: 300;
+      color: white;
+      letter-spacing: 3px;
+      font-variant-numeric: tabular-nums;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .call-btns {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .call-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      flex-shrink: 0;
+    }
+
+    .call-btn:active { transform: scale(0.93); }
+
+    .btn-mute   { background: oklch(26% 0.012 250); color: oklch(72% 0.01 250); }
+    .btn-speaker{ background: oklch(26% 0.012 250); color: oklch(72% 0.01 250); }
+    .btn-hangup {
+      width: 64px;
+      height: 64px;
+      background: var(--red);
+      color: white;
+    }
+
+    .call-btn.active-btn {
+      background: var(--blue);
+      color: white;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: oklch(0% 0 0 / 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-card {
+      background: white;
+      border-radius: var(--r-lg);
+      padding: 36px;
+      width: 460px;
+      max-width: 90vw;
+      box-shadow: 0 32px 96px oklch(0% 0 0 / 0.18);
+      transform: translateY(6px);
+      transition: transform 0.2s;
+    }
+
+    .modal-overlay.active .modal-card { transform: translateY(0); }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+
+    .modal-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 5px;
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+
+    .drop-zone {
+      border: 2px dashed oklch(88% 0.006 60);
+      border-radius: var(--r-md);
+      padding: 34px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.drag-over {
+      border-color: var(--blue);
+      background: var(--blue-light);
+    }
+
+    .drop-icon-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: oklch(93% 0.012 220);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      color: var(--blue);
+    }
+
+    .drop-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .drop-sub {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .format-hint {
+      background: oklch(97% 0.005 60);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--r-sm);
+      padding: 12px 14px;
+      margin-top: 16px;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      font-family: 'Courier New', monospace;
+      line-height: 1.6;
+    }
+
+    .format-hint strong {
+      display: block;
+      font-family: var(--font);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 22px;
+    }
+
+    .btn-secondary {
+      padding: 9px 18px;
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--panel-border-2);
+      border-radius: var(--r-sm);
+      font-family: var(--font);
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .btn-secondary:hover { background: var(--bg); }
+
+    .btn-sample {
+      background: none;
+      border: none;
+      font-family: var(--font);
+      font-size: 12.5px;
+      color: var(--blue);
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      background: var(--text-primary);
+      color: white;
+      padding: 11px 18px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 500;
+      z-index: 200;
+      transform: translateY(16px);
+      opacity: 0;
+      transition: all 0.22s;
+      box-shadow: 0 4px 24px oklch(0% 0 0 / 0.22);
+      pointer-events: none;
+    }
+
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* CCP (Amazon Connect Streams embed) */
+    .ccp-wrap {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      width: 320px;
+      height: 480px;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 18px 60px oklch(0% 0 0 / 0.28);
+      z-index: 90;
+      background: white;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .ccp-wrap.ready {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(24px);
+    }
+
+    .ccp-wrap.hidden { display: none; }
+
+    #ccp-container,
+    #ccp-container iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .ccp-header {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      padding: 6px 10px;
+      background: oklch(13% 0.015 250);
+      color: white;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
+    }
+
+    .ccp-header button {
+      background: transparent;
+      border: none;
+      color: oklch(70% 0.01 250);
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-gradient" id="sidebar-gradient"></div>
+    <div class="sidebar-top">
+      <div class="logo">
+        <div class="logo-mark">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6 19.79 19.79 0 0 1 1.61 5 2 2 0 0 1 3.6 2.81h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.4a16 16 0 0 0 6 6l.86-.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.03z"/>
+          </svg>
+        </div>
+        Dialer to Life Insurance
+      </div>
+      <div class="search-wrap">
+        <svg class="search-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input class="search-input" id="search" type="text" placeholder="Search contacts…" oninput="filterContacts()">
+      </div>
+    </div>
+
+    <div class="sidebar-actions">
+      <button class="btn-import" onclick="openImport()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        Import Contacts
+      </button>
+    </div>
+
+    <div class="list-header">
+      <span>Contacts</span>
+      <span id="contact-count" style="color:var(--sidebar-muted);font-size:11px;font-weight:500;">0</span>
+    </div>
+
+    <div class="contact-list" id="contact-list">
+      <div class="no-contacts">Import a CSV to<br>get started.</div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon-ring">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6 19.79 19.79 0 0 1 1.61 5 2 2 0 0 1 3.6 2.81h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.4a16 16 0 0 0 6 6l.86-.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.03z"/>
+        </svg>
+      </div>
+      <div class="empty-title">Select a contact</div>
+      <div class="empty-sub">Import contacts via CSV or pick one from the list to call or take notes.</div>
+    </div>
+
+    <div class="contact-detail" id="contact-detail" style="display:none;">
+      <div class="detail-header">
+        <div class="d-avatar" id="d-avatar"></div>
+        <div class="d-info">
+          <div class="d-name" id="d-name"></div>
+          <div class="d-company" id="d-company"></div>
+          <div class="d-phone" id="d-phone">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6 19.79 19.79 0 0 1 1.61 5 2 2 0 0 1 3.6 2.81h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.4a16 16 0 0 0 6 6l.86-.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.03z"/>
+            </svg>
+            <span id="d-phone-text"></span>
+          </div>
+          <div class="d-email" id="d-email"></div>
+        </div>
+        <div class="d-actions">
+          <button class="btn-call" onclick="startCall()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6 19.79 19.79 0 0 1 1.61 5 2 2 0 0 1 3.6 2.81h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.4a16 16 0 0 0 6 6l.86-.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.03z"/>
+            </svg>
+            Call
+          </button>
+        </div>
+      </div>
+
+      <div class="detail-body">
+        <div>
+          <div class="section-label">Call History</div>
+          <div class="call-chips" id="call-chips"></div>
+        </div>
+        <div>
+          <div class="section-label">Notes</div>
+          <textarea class="notes-area" id="notes-area" placeholder="Add notes about this contact — follow-ups, context, anything relevant…" oninput="saveNotes()"></textarea>
+          <div class="notes-save-hint" id="notes-hint"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div class="call-overlay" id="call-overlay">
+    <div class="call-card">
+      <div class="ring-wrap">
+        <div class="ring-pulse"></div>
+        <div class="ring-pulse"></div>
+        <div class="ring-avatar" id="ring-avatar"></div>
+      </div>
+      <div class="call-name-label" id="call-name-label"></div>
+      <div class="call-phone-label" id="call-phone-label"></div>
+      <div class="call-status-label" id="call-status-label">Calling…</div>
+      <div class="call-timer" id="call-timer"></div>
+      <div class="call-btns">
+        <button class="call-btn btn-mute" id="btn-mute" onclick="toggleMute()" title="Mute">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </button>
+        <button class="call-btn btn-hangup" onclick="endCall()" title="Hang up">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"/><line x1="23" y1="1" x2="1" y2="23"/>
+          </svg>
+        </button>
+        <button class="call-btn btn-speaker" id="btn-speaker" onclick="toggleSpeaker()" title="Speaker">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="import-overlay">
+    <div class="modal-card">
+      <div class="modal-title">Import Contacts</div>
+      <div class="modal-sub">Upload a CSV file with your contacts. We'll map columns automatically.</div>
+
+      <div class="drop-zone" id="drop-zone"
+           onclick="document.getElementById('csv-input').click()"
+           ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
+        <div class="drop-icon-circle">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <div class="drop-label">Drop your CSV file here</div>
+        <div class="drop-sub">or click to browse files</div>
+      </div>
+
+      <input type="file" id="csv-input" accept=".csv,.txt" style="display:none;" onchange="onFileSelect(event)">
+
+      <div class="format-hint">
+        <strong>Expected format</strong>
+        name, phone, email, company (optional)<br>
+        Jane Smith, 555-123-4567, jane@example.com, Acme Corp
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-sample" onclick="loadSampleData()">Load sample contacts</button>
+        <button class="btn-secondary" onclick="closeImport()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Amazon Connect Streams embedded CCP (audio lives inside the dialer) -->
+  <div class="ccp-wrap" id="ccp-wrap">
+    <div class="ccp-header">
+      <span>Amazon Connect agent</span>
+      <button type="button" onclick="document.getElementById('ccp-wrap').classList.add('hidden')" title="Hide">×</button>
+    </div>
+    <div id="ccp-container"></div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="https://unpkg.com/amazon-connect-streams@2.18.4/release/connect-streams-min.js"></script>
+
+  <script>
+    const runtimeConfig = window.DIALER_CONFIG || {};
+
+    // Backend endpoints for placing and stopping real calls via AWS Connect.
+    // When the backend is unavailable, the UI falls back to the simulated call flow.
+    const CALL_API = runtimeConfig.callApi || window.CALL_API || '/api/call';
+    const CALL_STOP_API =
+      runtimeConfig.callStopApi ||
+      window.CALL_STOP_API ||
+      `${CALL_API.replace(/\/$/, '')}/stop`;
+
+    let contacts = [];
+    let selected = null;
+    let timerInterval = null;
+    let connectDelayTimeout = null;
+    let callSecs = 0;
+    let muted = false;
+    let speakerOn = true;
+    let currentContactId = null;
+    let activeCall = null;
+
+    const COLORS = [145, 220, 280, 340, 45, 185, 310, 260, 15, 165];
+
+    function avatarColor(name) {
+      let h = 0;
+      for (let c of name) h = (h * 31 + c.charCodeAt(0)) % COLORS.length;
+      return `oklch(52% 0.18 ${COLORS[h]})`;
+    }
+
+    function initials(name) {
+      return name.trim().split(/\s+/).map(w => w[0] || '').slice(0, 2).join('').toUpperCase();
+    }
+
+    function esc(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function load() {
+      try {
+        const d = localStorage.getItem('dialer_v2');
+        if (d) contacts = JSON.parse(d);
+        renderList();
+      } catch(e) { contacts = []; }
+    }
+
+    function save() {
+      localStorage.setItem('dialer_v2', JSON.stringify(contacts));
+    }
+
+    function renderList(q = '') {
+      const list = document.getElementById('contact-list');
+      const countEl = document.getElementById('contact-count');
+      q = q.toLowerCase();
+
+      const filtered = contacts.filter(c =>
+        c.name.toLowerCase().includes(q) ||
+        (c.phone && c.phone.includes(q)) ||
+        (c.email && c.email.toLowerCase().includes(q)) ||
+        (c.company && c.company.toLowerCase().includes(q))
+      );
+
+      countEl.textContent = filtered.length;
+
+      if (filtered.length === 0) {
+        list.innerHTML = `<div class="no-contacts">${contacts.length === 0 ? 'Import a CSV to<br>get started.' : 'No results.'}</div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(c => `
+        <div class="contact-item${selected && selected.id === c.id ? ' active' : ''}" onclick="selectContact('${c.id}')">
+          <div class="c-avatar" style="background:${avatarColor(c.name)}">${esc(initials(c.name))}</div>
+          <div class="c-meta">
+            <div class="c-name">${esc(c.name)}</div>
+            <div class="c-phone">${esc(c.phone || '—')}</div>
+          </div>
+          ${c.called ? '<div class="called-pip" title="Called"></div>' : ''}
+        </div>
+      `).join('');
+    }
+
+    function filterContacts() {
+      renderList(document.getElementById('search').value);
+    }
+
+    function selectContact(id) {
+      selected = contacts.find(c => c.id === id) || null;
+      if (!selected) return;
+      currentContactId = selected.id;
+
+      document.getElementById('empty-state').style.display = 'none';
+      document.getElementById('contact-detail').style.display = 'flex';
+
+      const av = document.getElementById('d-avatar');
+      av.textContent = initials(selected.name);
+      av.style.background = avatarColor(selected.name);
+
+      document.getElementById('d-name').textContent = selected.name;
+
+      const compEl = document.getElementById('d-company');
+      compEl.textContent = selected.company || '';
+      compEl.style.display = selected.company ? 'block' : 'none';
+
+      document.getElementById('d-phone-text').textContent = selected.phone || 'No phone number';
+      document.getElementById('d-email').textContent = selected.email || '';
+
+      document.getElementById('notes-area').value = selected.notes || '';
+      document.getElementById('notes-hint').textContent = '';
+
+      renderCallHistory();
+      renderList(document.getElementById('search').value);
+    }
+
+    function renderCallHistory() {
+      const el = document.getElementById('call-chips');
+      if (!selected) return;
+      const calls = selected.calls || [];
+      if (calls.length === 0) {
+        el.innerHTML = '<div class="no-calls">No calls logged yet.</div>';
+        return;
+      }
+      el.innerHTML = calls.map(call => `
+        <div class="call-chip">
+          <div class="chip-dot"></div>
+          <span>${esc(call.date)}</span>
+          <span style="color:var(--text-muted);margin-left:2px;">· ${esc(call.duration)}</span>
+        </div>
+      `).join('');
+    }
+
+    let notesDebounce = null;
+
+    function saveNotes() {
+      if (!selected) return;
+      const val = document.getElementById('notes-area').value;
+      selected.notes = val;
+      const c = contacts.find(x => x.id === selected.id);
+      if (c) c.notes = val;
+
+      clearTimeout(notesDebounce);
+      notesDebounce = setTimeout(() => {
+        save();
+        document.getElementById('notes-hint').textContent = 'Saved';
+        setTimeout(() => {
+          if (document.getElementById('notes-hint').textContent === 'Saved')
+            document.getElementById('notes-hint').textContent = '';
+        }, 1800);
+      }, 600);
+    }
+
+    async function placeRealCall(phone, contactId, name) {
+      try {
+        const res = await fetch(CALL_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, contactId, name })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || `Backend ${res.status}`);
+        return data;
+      } catch (err) {
+        console.warn('Real call backend unavailable, using simulation:', err.message);
+        return null;
+      }
+    }
+
+    async function stopRealCall(contactId) {
+      if (!contactId) return true;
+
+      try {
+        const res = await fetch(CALL_STOP_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contactId })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || `Backend ${res.status}`);
+        return true;
+      } catch (err) {
+        console.warn('Failed to stop live Connect contact:', err.message);
+        return false;
+      }
+    }
+
+    function startCallTimer() {
+      clearTimeout(connectDelayTimeout);
+      clearInterval(timerInterval);
+
+      connectDelayTimeout = setTimeout(() => {
+        document.getElementById('call-status-label').textContent = 'Connected';
+        timerInterval = setInterval(() => {
+          callSecs++;
+          const m = Math.floor(callSecs / 60);
+          const s = callSecs % 60;
+          document.getElementById('call-timer').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+        }, 1000);
+      }, 2000);
+    }
+
+    async function startCall() {
+      if (!selected) return;
+      if (!selected.phone) {
+        showToast('This contact does not have a phone number.');
+        return;
+      }
+
+      const av = document.getElementById('ring-avatar');
+      av.textContent = initials(selected.name);
+      av.style.background = avatarColor(selected.name);
+
+      document.getElementById('call-name-label').textContent = selected.name;
+      document.getElementById('call-phone-label').textContent = selected.phone || '';
+      document.getElementById('call-status-label').textContent = 'Calling…';
+      document.getElementById('call-timer').textContent = '';
+
+      muted = false; speakerOn = true;
+      document.getElementById('btn-mute').classList.remove('active-btn');
+      document.getElementById('btn-speaker').classList.remove('active-btn');
+      callSecs = 0;
+      clearInterval(timerInterval);
+      clearTimeout(connectDelayTimeout);
+      activeCall = null;
+
+      document.getElementById('call-overlay').classList.add('active');
+
+      const result = await placeRealCall(selected.phone, selected.id, selected.name);
+      if (result?.sourcePhoneNumber) {
+        document.getElementById('call-phone-label').textContent = `${selected.phone} · From ${result.sourcePhoneNumber}`;
+      }
+
+      if (result?.contactId) {
+        activeCall = {
+          contactId: result.contactId,
+          sourcePhoneNumber: result.sourcePhoneNumber || '',
+          simulated: false
+        };
+        document.getElementById('call-status-label').textContent = 'Connecting via AWS Connect…';
+      } else {
+        activeCall = { contactId: null, sourcePhoneNumber: '', simulated: true };
+        document.getElementById('call-status-label').textContent = 'Simulated call';
+        showToast('AWS Connect backend unavailable. Using simulated call UI.');
+      }
+
+      startCallTimer();
+    }
+
+    async function endCall() {
+      const contactIdToStop = activeCall?.contactId || null;
+      document.getElementById('call-overlay').classList.remove('active');
+      clearInterval(timerInterval);
+      clearTimeout(connectDelayTimeout);
+      timerInterval = null;
+      connectDelayTimeout = null;
+
+      if (!selected) return;
+
+      try {
+        if (window.streamsContact) {
+          const conn = window.streamsContact.getAgentConnection?.();
+          if (conn && typeof conn.destroy === 'function') conn.destroy();
+        }
+      } catch (e) { console.warn('Streams destroy failed:', e); }
+
+      if (contactIdToStop) {
+        const stopped = await stopRealCall(contactIdToStop);
+        if (!stopped) {
+          showToast('Call UI ended, but Connect could not confirm hang up.');
+        }
+      }
+
+      activeCall = null;
+
+      const connected = callSecs > 0;
+      const dur = connected ? formatDur(callSecs) : 'Not connected';
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+        + ' at ' + now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+      if (!selected.calls) selected.calls = [];
+      selected.calls.unshift({ date: dateStr, duration: dur });
+      selected.called = true;
+
+      const c = contacts.find(x => x.id === selected.id);
+      if (c) { c.calls = selected.calls; c.called = true; }
+
+      save();
+      renderCallHistory();
+      renderList(document.getElementById('search').value);
+      showToast(`Call ended · ${dur}`);
+    }
+
+    function formatDur(s) {
+      const m = Math.floor(s / 60), sec = s % 60;
+      return m > 0 ? `${m}m ${sec}s` : `${sec}s`;
+    }
+
+    function toggleMute() {
+      muted = !muted;
+      document.getElementById('btn-mute').classList.toggle('active-btn', muted);
+      try {
+        if (window.streamsAgent) {
+          muted ? window.streamsAgent.mute() : window.streamsAgent.unmute();
+        }
+      } catch (e) { console.warn('Streams mute failed:', e); }
+    }
+
+    function toggleSpeaker() {
+      speakerOn = !speakerOn;
+      document.getElementById('btn-speaker').classList.toggle('active-btn', speakerOn);
+    }
+
+    function openImport() {
+      document.getElementById('import-overlay').classList.add('active');
+    }
+
+    function closeImport() {
+      document.getElementById('import-overlay').classList.remove('active');
+    }
+
+    document.getElementById('import-overlay').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeImport();
+    });
+
+    function onDragOver(e) {
+      e.preventDefault();
+      document.getElementById('drop-zone').classList.add('drag-over');
+    }
+
+    function onDragLeave() {
+      document.getElementById('drop-zone').classList.remove('drag-over');
+    }
+
+    function onDrop(e) {
+      e.preventDefault();
+      document.getElementById('drop-zone').classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file) processFile(file);
+    }
+
+    function onFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) processFile(file);
+      e.target.value = '';
+    }
+
+    function processFile(file) {
+      const reader = new FileReader();
+      reader.onload = e => parseCSV(e.target.result);
+      reader.readAsText(file);
+    }
+
+    function parseCSV(text) {
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length < 2) { showToast('CSV appears empty.'); return; }
+
+      const header = parseLine(lines[0]).map(h =>
+        h.toLowerCase().replace(/[^a-z0-9]/g, '')
+      );
+
+      const col = (keys) => {
+        for (const k of keys) {
+          const i = header.findIndex(h => h.includes(k));
+          if (i >= 0) return i;
+        }
+        return -1;
+      };
+
+      const nameIdx    = col(['fullname','name','full']);
+      const firstIdx   = col(['first','firstname']);
+      const lastIdx    = col(['last','lastname']);
+      const phoneIdx   = col(['phone','mobile','tel','cell','number']);
+      const emailIdx   = col(['email','mail']);
+      const companyIdx = col(['company','org','organization','employer','business']);
+
+      let added = 0;
+      for (let i = 1; i < lines.length; i++) {
+        const cols = parseLine(lines[i]);
+        let name = '';
+
+        if (nameIdx >= 0 && cols[nameIdx]) {
+          name = cols[nameIdx].trim();
+        } else if (firstIdx >= 0 || lastIdx >= 0) {
+          name = [cols[firstIdx] || '', cols[lastIdx] || ''].join(' ').trim();
+        } else {
+          name = (cols[0] || '').trim();
+        }
+
+        if (!name) continue;
+
+        const phone   = (phoneIdx   >= 0 ? cols[phoneIdx]   : cols[1] || '').trim();
+        const email   = (emailIdx   >= 0 ? cols[emailIdx]   : cols[2] || '').trim();
+        const company = (companyIdx >= 0 ? cols[companyIdx] : cols[3] || '').trim();
+
+        contacts.push({
+          id: crypto.randomUUID(),
+          name, phone, email, company,
+          notes: '', called: false, calls: []
+        });
+        added++;
+      }
+
+      save();
+      renderList();
+      closeImport();
+      showToast(`${added} contact${added !== 1 ? 's' : ''} imported`);
+    }
+
+    function parseLine(line) {
+      const res = [];
+      let cur = '', inQ = false;
+      for (const ch of line) {
+        if (ch === '"') { inQ = !inQ; }
+        else if (ch === ',' && !inQ) { res.push(cur); cur = ''; }
+        else { cur += ch; }
+      }
+      res.push(cur);
+      return res;
+    }
+
+    function loadSampleData() {
+      const samples = [
+        { name: 'Alex Rivera',    phone: '(555) 201-4832', email: 'alex.rivera@example.com',   company: 'Meridian Group' },
+        { name: 'Jordan Kim',     phone: '(555) 384-9021', email: 'jordan.kim@example.com',    company: 'Apex Solutions' },
+        { name: 'Sam Okafor',     phone: '(555) 470-6615', email: 'sam.okafor@example.com',    company: 'Vantage Corp' },
+        { name: 'Taylor Chen',    phone: '(555) 512-3789', email: 'taylor.chen@example.com',   company: '' },
+        { name: 'Morgan Blake',   phone: '(555) 694-2201', email: 'morgan.blake@example.com',  company: 'Lumen Labs' },
+        { name: 'Casey Patel',    phone: '(555) 731-0048', email: 'casey.patel@example.com',   company: 'NorthStar Co' },
+        { name: 'Drew Hollis',    phone: '(555) 852-9930', email: 'drew.hollis@example.com',   company: '' },
+        { name: 'Quinn Nakamura', phone: '(555) 963-1177', email: 'quinn.n@example.com',       company: 'Summit Tech' },
+      ];
+      samples.forEach(s => contacts.push({ ...s, id: crypto.randomUUID(), notes: '', called: false, calls: [] }));
+      save();
+      renderList();
+      closeImport();
+      showToast(`${samples.length} sample contacts loaded`);
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    load();
+
+    // ── Amazon Connect Streams (embedded CCP) ───────────────
+    window.streamsAgent = null;
+    window.streamsContact = null;
+
+    function initStreamsCCP() {
+      if (!window.connect || !window.connect.core) {
+        console.warn('amazon-connect-streams did not load; skipping CCP embed.');
+        return;
+      }
+      const ccpUrl =
+        runtimeConfig.ccpUrl ||
+        window.CCP_URL ||
+        'https://manualdialer20260414195157.my.connect.aws/ccp-v2/';
+      try {
+        connect.core.initCCP(document.getElementById('ccp-container'), {
+          ccpUrl,
+          loginPopup: true,
+          loginPopupAutoClose: true,
+          loginOptions: { autoClose: true, height: 600, width: 400 },
+          softphone: { allowFramedSoftphone: true, disableRingtone: false },
+          pageOptions: {
+            enableAudioDeviceSettings: false,
+            enablePhoneTypeSettings: false,
+          },
+        });
+      } catch (e) {
+        console.warn('initCCP failed:', e);
+        return;
+      }
+
+      connect.agent(agent => {
+        window.streamsAgent = agent;
+        try {
+          const states = agent.getAgentStates();
+          const routable = states.find(s => s.type === connect.AgentStateType.ROUTABLE);
+          if (routable && agent.getState().type !== connect.AgentStateType.ROUTABLE) {
+            agent.setState(routable, {
+              success: () => console.log('Agent set to Available'),
+              failure: e => console.warn('Failed to set Available:', e),
+            });
+          }
+        } catch (e) { console.warn('Agent state init failed:', e); }
+        document.getElementById('ccp-wrap').classList.add('ready');
+      });
+
+      connect.contact(contact => {
+        window.streamsContact = contact;
+
+        contact.onIncoming(() => {
+          contact.accept({
+            success: () => console.log('Contact auto-accepted by dialer'),
+            failure: e => console.warn('Auto-accept failed:', e),
+          });
+        });
+
+        contact.onConnecting(() => {
+          const lbl = document.getElementById('call-status-label');
+          if (lbl) lbl.textContent = 'Connecting…';
+        });
+
+        contact.onConnected(() => {
+          const lbl = document.getElementById('call-status-label');
+          if (lbl) lbl.textContent = 'Connected';
+          clearTimeout(connectDelayTimeout);
+          clearInterval(timerInterval);
+          callSecs = 0;
+          timerInterval = setInterval(() => {
+            callSecs++;
+            const m = Math.floor(callSecs / 60);
+            const s = callSecs % 60;
+            const t = document.getElementById('call-timer');
+            if (t) t.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+          }, 1000);
+        });
+
+        contact.onEnded(() => {
+          window.streamsContact = null;
+          const overlay = document.getElementById('call-overlay');
+          if (overlay && overlay.classList.contains('active')) {
+            try { endCall(); } catch (e) { console.warn(e); }
+          }
+        });
+      });
+    }
+
+    if (document.readyState === 'complete') {
+      initStreamsCCP();
+    } else {
+      window.addEventListener('load', initStreamsCCP);
+    }
+  </script>
+
+  <!-- ShaderGradient mount (https://github.com/ruucm/shadergradient) -->
+  <script type="module">
+    import React from 'https://esm.sh/react@18.2.0';
+    import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
+    import { ShaderGradientCanvas, ShaderGradient } from
+      'https://esm.sh/@shadergradient/react@2.0.23?bundle&deps=react@18.2.0,react-dom@18.2.0,three@0.154.0';
+
+    const container = document.getElementById('sidebar-gradient');
+    if (container) {
+      const urlString =
+        'https://www.shadergradient.co/customize' +
+        '?animate=on&axesHelper=off&bgColor1=%23000000&bgColor2=%23000000' +
+        '&brightness=1.05&cAzimuthAngle=180&cDistance=3.6&cPolarAngle=95' +
+        '&cameraZoom=1&color1=%2300C36A&color2=%2329B0FF&color3=%231B1F2A' +
+        '&destination=onCanvas&embedMode=off&envPreset=city&format=gif&fov=45' +
+        '&frameRate=10&grain=on&lightType=3d&pixelDensity=1' +
+        '&positionX=-1.4&positionY=0&positionZ=0&range=enabled&rangeEnd=40' +
+        '&rangeStart=0&reflection=0.1&rotationX=0&rotationY=10&rotationZ=50' +
+        '&shader=defaults&type=waterPlane&uAmplitude=0&uDensity=1.3' +
+        '&uFrequency=5.5&uSpeed=0.2&uStrength=3&uTime=0&wireframe=false';
+
+      try {
+        const root = createRoot(container);
+        root.render(
+          React.createElement(
+            ShaderGradientCanvas,
+            { style: { position: 'absolute', inset: 0, width: '100%', height: '100%' } },
+            React.createElement(ShaderGradient, { control: 'query', urlString })
+          )
+        );
+      } catch (err) {
+        console.warn('ShaderGradient failed to mount, falling back:', err);
+        container.style.background =
+          'radial-gradient(120% 80% at 20% 0%, oklch(40% 0.18 220 / 0.45), transparent 60%),' +
+          'radial-gradient(100% 70% at 80% 100%, oklch(60% 0.22 145 / 0.35), transparent 60%)';
+      }
+    }
+  </script>
+
+</body>
+</html>
