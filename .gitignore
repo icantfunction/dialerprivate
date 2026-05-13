@@ -1,3 +1,4 @@
 .claude/
+.deploy/
 backend/.env
 backend/node_modules/
