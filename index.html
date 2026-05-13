@@ -321,6 +321,344 @@
       box-shadow: none;
     }
 
+    /* Call script drawer */
+    .script-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 460px;
+      max-width: 94vw;
+      background: white;
+      border-left: 1px solid var(--panel-border);
+      box-shadow: -22px 0 60px oklch(0% 0 0 / 0.18);
+      z-index: 80;
+      transform: translateX(100%);
+      transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .script-drawer.open { transform: translateX(0); }
+
+    .script-header {
+      padding: 22px 26px 16px;
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .script-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+
+    .script-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .script-close {
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px 10px;
+      border-radius: 6px;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .script-close:hover { background: oklch(95% 0.005 60); color: var(--red); }
+
+    .script-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 22px 26px 32px;
+    }
+
+    .script-body::-webkit-scrollbar { width: 4px; }
+    .script-body::-webkit-scrollbar-thumb { background: oklch(88% 0.006 60); border-radius: 2px; }
+
+    .script-section { margin-bottom: 26px; }
+    .script-section:last-child { margin-bottom: 0; }
+
+    .script-section-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--blue);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .script-section-label .pill {
+      background: var(--blue);
+      color: white;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 9.5px;
+      letter-spacing: 0.05em;
+    }
+
+    .script-section-label.objection      { color: var(--red); }
+    .script-section-label.objection .pill { background: var(--red); }
+    .script-section-label.action          { color: oklch(50% 0.16 70); }
+    .script-section-label.action .pill    { background: oklch(60% 0.16 70); }
+    .script-section-label.va              { color: var(--green-dark); }
+    .script-section-label.va .pill        { background: var(--green-dark); }
+
+    .script-quote {
+      background: oklch(97% 0.005 60);
+      border-left: 3px solid var(--blue);
+      padding: 12px 16px;
+      border-radius: 0 var(--r-sm) var(--r-sm) 0;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      font-size: 14.5px;
+      line-height: 1.55;
+    }
+
+    .script-quote.customer {
+      border-left-color: var(--red);
+      background: oklch(97% 0.012 25);
+      font-style: italic;
+      color: var(--text-secondary);
+    }
+
+    .script-quote.agent {
+      border-left-color: var(--green);
+      background: oklch(97% 0.012 145);
+    }
+
+    .script-cue {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .script-action {
+      background: oklch(96% 0.025 70);
+      border: 1px dashed oklch(72% 0.12 70);
+      border-radius: var(--r-md);
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      font-weight: 600;
+      font-size: 14px;
+      color: oklch(36% 0.14 70);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+
+    .script-action::before {
+      content: "→";
+      font-size: 16px;
+      line-height: 1.4;
+      flex-shrink: 0;
+    }
+
+    .script-va-list {
+      list-style: none;
+      padding: 0;
+      display: grid;
+      gap: 6px;
+    }
+
+    .script-va-list li {
+      padding: 10px 14px;
+      background: oklch(96% 0.014 145);
+      border-radius: var(--r-sm);
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-left: 3px solid var(--green);
+    }
+
+    .script-va-list li .star {
+      color: var(--green-dark);
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    .script-va-list li .what {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      margin-left: 6px;
+    }
+
+    .script-intro {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 12px;
+    }
+
+    .script-nav {
+      display: flex;
+      gap: 4px;
+      padding: 10px 14px;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--panel-border);
+      background: oklch(98% 0.004 60);
+    }
+
+    .script-nav::-webkit-scrollbar { height: 4px; }
+    .script-nav::-webkit-scrollbar-thumb { background: oklch(88% 0.006 60); border-radius: 2px; }
+
+    .script-nav button {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--r-full);
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s, border-color 0.12s;
+      white-space: nowrap;
+    }
+
+    .script-nav button:hover {
+      background: white;
+      border-color: var(--panel-border-2);
+      color: var(--text-primary);
+    }
+
+    .script-nav button.active {
+      background: var(--text-primary);
+      color: white;
+      border-color: var(--text-primary);
+    }
+
+    .script-tip {
+      background: oklch(97% 0.003 250);
+      border-left: 3px solid oklch(78% 0.02 250);
+      padding: 9px 14px;
+      border-radius: 0 var(--r-sm) var(--r-sm) 0;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .script-tip strong {
+      font-style: normal;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      font-size: 10.5px;
+      letter-spacing: 0.08em;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .script-step {
+      counter-increment: scriptstep;
+      position: relative;
+      padding: 10px 14px 10px 38px;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--r-sm);
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    .script-step::before {
+      content: counter(scriptstep);
+      position: absolute;
+      left: 12px;
+      top: 10px;
+      width: 20px;
+      height: 20px;
+      background: var(--blue);
+      color: white;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .script-steps { counter-reset: scriptstep; }
+
+    .script-section h3.script-sub {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 14px 0 8px;
+    }
+
+    .script-section ul.script-bullets {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 12px;
+    }
+
+    .script-section ul.script-bullets li {
+      position: relative;
+      padding: 4px 0 4px 16px;
+      font-size: 13.5px;
+      color: var(--text-primary);
+      line-height: 1.55;
+    }
+
+    .script-section ul.script-bullets li::before {
+      content: "•";
+      position: absolute;
+      left: 4px;
+      color: var(--text-muted);
+    }
+
+    .script-pushback {
+      background: oklch(97% 0.012 145);
+      border-left: 3px solid var(--green);
+      padding: 12px 16px;
+      border-radius: 0 var(--r-sm) var(--r-sm) 0;
+      margin-bottom: 10px;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-primary);
+    }
+
+    .script-pushback .label {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--green-dark);
+      background: oklch(94% 0.05 145);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+
     .list-header {
       padding: 14px 18px 6px;
       font-size: 10.5px;
@@ -1275,6 +1613,15 @@
         </svg>
         Keypad
       </button>
+      <button class="btn-keypad" onclick="toggleScript()" title="Open call script (Alt+S)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="9" y1="13" x2="15" y2="13"/>
+          <line x1="9" y1="17" x2="15" y2="17"/>
+        </svg>
+        Script
+      </button>
     </div>
 
     <div class="list-header">
@@ -1466,6 +1813,363 @@
       </div>
     </div>
   </div>
+
+  <!-- CFG Million Dollar Script drawer -->
+  <aside class="script-drawer" id="script-drawer" aria-hidden="true">
+    <div class="script-header">
+      <div>
+        <div class="script-title">CFG · Million Dollar Script</div>
+        <div class="script-subtitle">Widow-of-Veteran outreach · Live call playbook</div>
+      </div>
+      <button class="script-close" type="button" onclick="closeScript()" aria-label="Close script">×</button>
+    </div>
+
+    <nav class="script-nav" id="script-nav">
+      <button type="button" data-target="s-intro" onclick="scrollScript('s-intro')">Intro</button>
+      <button type="button" data-target="s-rapport" onclick="scrollScript('s-rapport')">Rapport</button>
+      <button type="button" data-target="s-profile" onclick="scrollScript('s-profile')">Profile</button>
+      <button type="button" data-target="s-coverage" onclick="scrollScript('s-coverage')">Existing Cov.</button>
+      <button type="button" data-target="s-income" onclick="scrollScript('s-income')">Income</button>
+      <button type="button" data-target="s-app" onclick="scrollScript('s-app')">Application</button>
+      <button type="button" data-target="s-medical" onclick="scrollScript('s-medical')">Medical</button>
+      <button type="button" data-target="s-benefits" onclick="scrollScript('s-benefits')">Benefits</button>
+      <button type="button" data-target="s-quote" onclick="scrollScript('s-quote')">Quote</button>
+      <button type="button" data-target="s-bank" onclick="scrollScript('s-bank')">Banking</button>
+      <button type="button" data-target="s-close" onclick="scrollScript('s-close')">Lock Close</button>
+      <button type="button" data-target="s-obj1" onclick="scrollScript('s-obj1')">Intro Obj.</button>
+      <button type="button" data-target="s-obj2" onclick="scrollScript('s-obj2')">Numbers Obj.</button>
+      <button type="button" data-target="s-va" onclick="scrollScript('s-va')">VA Programs</button>
+    </nav>
+
+    <div class="script-body" id="script-body">
+
+      <!-- INTRO -->
+      <section class="script-section" id="s-intro">
+        <div class="script-section-label"><span class="pill">01</span> Intro</div>
+        <div class="script-quote agent">
+          "Hello <strong>(CLIENT NAME)</strong>, this is <strong>YOUR NAME</strong> with the Benefits Office.<br><br>
+          How are you doing today?<br><br>
+          I got your request, it looks like you wanted me to go over your entitlements for being a Widow of a Veteran. You are in <strong>(STATE)</strong> — is that correct?"
+          <div class="script-cue">PAUSE</div>
+        </div>
+        <div class="script-quote agent">
+          "Perfect, I am the Underwriter assigned to your File. That is going to help you with all the benefits you are entitled to!<br><br>
+          Were you looking for something specific? How can I assist you today?"
+        </div>
+        <div class="script-tip"><strong>Agent note</strong>For-agents-only intro objections live in the Objections section at the bottom.</div>
+      </section>
+
+      <!-- RAPPORT -->
+      <section class="script-section" id="s-rapport">
+        <div class="script-section-label"><span class="pill">02</span> Build Rapport & Discovery</div>
+        <div class="script-quote agent">
+          "Okay, I will check on all the benefits you are entitled to, so you don't miss out on anything that is available for Widows of Veterans."
+        </div>
+        <ul class="script-bullets">
+          <li>Are you looking more into <strong>medical</strong> or <strong>financial</strong> help?</li>
+          <li>Are you currently getting any benefits?</li>
+        </ul>
+        <div class="script-tip"><strong>Soften</strong>Ask about kids, weather, anything human — keep it loose before pivoting.</div>
+      </section>
+
+      <!-- PROFILE -->
+      <section class="script-section" id="s-profile">
+        <div class="script-section-label"><span class="pill">03</span> Profile Verification</div>
+        <div class="script-quote agent">
+          "Okay, thank you for that information."
+          <div class="script-cue">PAUSE for the next question</div>
+        </div>
+        <div class="script-quote agent">
+          "Let me pull up your profile details and see what you may qualify for.<br><br>
+          May I have your <strong>ZIP code</strong>? And your <strong>date of birth</strong>?"
+          <div class="script-cue">LET THEM REACT</div>
+        </div>
+        <div class="script-quote agent">"Perfect, I was able to find you here in the system."</div>
+        <div class="script-quote agent">"If you don't mind me asking, when did your husband pass away?"</div>
+        <div class="script-quote agent">"God bless you, ma'am. When he passed, did you have to come out of pocket for anything?"</div>
+        <div class="script-quote agent">
+          "I see. Well ma'am, I see here that those benefits will transfer over to you. If, God forbid, something happens to you, they will take care of your burial."
+          <div class="script-cue">LET THEM REACT</div>
+        </div>
+        <div class="script-quote agent">
+          "Yeah, because if you get this covered <em>outside</em> of your entitlements they're going to charge you hundreds of dollars. But if you use your entitlements, it's going to cost you a lot less."
+        </div>
+        <div class="script-quote agent">"Yes, you can get that taken care of through your entitlements. Do you have anything in place to cover the burial?"</div>
+      </section>
+
+      <!-- EXISTING COVERAGE -->
+      <section class="script-section" id="s-coverage">
+        <div class="script-section-label action"><span class="pill">04</span> If They Have Coverage</div>
+        <div class="script-quote agent">"That's great to hear!"</div>
+        <div class="script-quote agent">"Was that coverage set up through the VA?"
+          <div class="script-cue">They will always say no.</div>
+        </div>
+        <ul class="script-bullets">
+          <li>"How come? Is it a Term Life?"</li>
+          <li>"How much is the coverage? For how long have you had it?"</li>
+        </ul>
+        <div class="script-quote agent">
+          "Perfect. Ma'am, are you willing to have your <strong>(beneficiary / family)</strong> use the life insurance money to cover the burial, or would you like to just use your entitlements to cover everything?"
+        </div>
+        <div class="script-quote agent">
+          "So the coverage you have now would be extra money you're leaving behind for your family, and your entitlements will cover the burial. That way your family doesn't have to use the life insurance money."
+        </div>
+        <div class="script-tip"><strong>If they say no</strong>Continue straight into the qualification questions below.</div>
+        <div class="script-quote agent">"To determine your eligibility, I will ask you some questions about your income and some medical questions."</div>
+      </section>
+
+      <!-- INCOME -->
+      <section class="script-section" id="s-income">
+        <div class="script-section-label"><span class="pill">05</span> Income Qualification</div>
+        <ul class="script-bullets">
+          <li>"Now, are you currently <strong>working</strong>, <strong>retired</strong>, or <strong>disabled</strong>?"</li>
+          <li><em>If retired:</em> "I can't wait to say that one day!"</li>
+          <li><em>If disabled:</em> "Bless your heart!"</li>
+          <li>"What would you say you bring in per month, just to the ballpark?"</li>
+          <li>"Is there anyone at the house depending on you financially?" <span style="color:var(--text-muted);font-size:12px;">(skip if already mentioned)</span></li>
+          <li>"At the end of the month, once you pay all your bills, utilities, and all the fun things you like to do — how much would you say you are typically left with?"</li>
+        </ul>
+        <div class="script-pushback">
+          <span class="label">Income Objection</span>
+          <strong>"Why do you need to know that?"</strong><br>
+          "The benefits that you are going to be entitled to depend on how much income is left over."
+        </div>
+      </section>
+
+      <!-- APPLICATION -->
+      <section class="script-section" id="s-app">
+        <div class="script-section-label"><span class="pill">06</span> Start the Application</div>
+        <div class="script-quote agent">
+          "Thank you, ma'am. I'll go ahead and fill out this request for you. Let's start with your address. What is a good address for you?"
+        </div>
+        <div class="script-tip"><strong>Workflow</strong>Walk through the application form fields — <em>except SSN</em> — then proceed to height/weight and medical.</div>
+        <div class="script-quote agent">"Okay, thank you, ma'am. Now we are going to move on to the medical side of things. My mom would hate me if I asked you this, but what is a good height and weight for you?"</div>
+        <div class="script-quote agent">
+          "Gotcha! They're going to pull your medical records now — they're going to look at medications and doctors you're seeing to determine your eligibility, okay?"
+          <div class="script-cue">Get an "okay" from them.</div>
+        </div>
+        <div class="script-quote agent">"Okay, now they're going to pull your medical records. What is your social?"</div>
+
+        <h3 class="script-sub">Social Security Objection</h3>
+        <div class="script-pushback">
+          <span class="label">Push Back #1</span>
+          "I completely understand. Now, the main reason they ask for that piece of information is that's how they can identify and know you're <em>first</em> and <em>last name</em> for the medical information bureau. Does that make sense? Go ahead with your social, please."
+        </div>
+        <div class="script-pushback">
+          <span class="label">Push Back #2</span>
+          "I completely understand. Most importantly, that's the ONLY thing on your death certificate when you die for them to pay out your loved ones. Does that make sense? Go ahead with your social, please."
+        </div>
+      </section>
+
+      <!-- MEDICAL -->
+      <section class="script-section" id="s-medical">
+        <div class="script-section-label"><span class="pill">07</span> Medical Questions</div>
+        <div class="script-quote agent">"Got it. Now I'm going to ask you some medical questions."</div>
+        <div class="script-quote agent">"Now, for all of your medical needs, do you go to the VA or a civilian doctor? Are all of your prescriptions prescribed through the VA or a civilian doctor?"</div>
+        <div class="script-tip"><strong>If yes</strong>"Have you ever been rushed to a non-VA hospital for an emergency? What was that for?"</div>
+        <ul class="script-bullets">
+          <li>Any heart attacks, heart failure, strokes, TIA, or stents in the last 5 years?
+            <ul class="script-bullets">
+              <li><em>If yes:</em> Are you currently on any blood thinners or heart medications?</li>
+              <li>Blood thinners: <strong>Plavix</strong> or <strong>warfarin</strong>?</li>
+              <li>Heart meds: <strong>Nitrostat</strong>, <strong>nitroglycerin</strong>, <strong>Eliquis</strong>?</li>
+            </ul>
+          </li>
+          <li>Any cancer in the last 5 years? What kind? How long in remission (cancer-free)?</li>
+          <li>Any diabetes? <em>If yes:</em> Are you on <strong>metformin</strong> or <strong>insulin</strong>?</li>
+          <li>Any neuropathy? <em>If yes:</em> Are you taking <strong>gabapentin</strong>?</li>
+          <li>Any high blood pressure? <em>If yes:</em> Are you taking <strong>lisinopril</strong>, <strong>metoprolol</strong>, or <strong>amlodipine</strong>?</li>
+          <li>Any breathing complications or COPD? <em>If yes:</em> Are you on oxygen or an inhaler?</li>
+          <li>Any anxiety or depression? <em>If yes:</em> Are you taking <strong>Prozac</strong> or <strong>Seroquel</strong>?</li>
+          <li>Any kidney or liver problems? <em>If kidney:</em> any failure / disorder / dialysis?</li>
+          <li>Any hospitalizations in the last year for 48 hours or more?</li>
+          <li>One last thing — a rough height and weight for you?</li>
+        </ul>
+      </section>
+
+      <!-- BENEFITS -->
+      <section class="script-section" id="s-benefits">
+        <div class="script-section-label"><span class="pill">08</span> Benefits Presentation</div>
+        <div class="script-quote agent">"Perfect, ma'am. It looks like you are entitled to a lot. Please get a pen and paper so you can write them down."</div>
+        <div class="script-tip"><strong>Agent rule</strong>Focus on what value brings to <em>them</em>, not your value. Pick <strong>4</strong> features — and ALWAYS include <strong>Living Benefits</strong>. By this point you should be on the bank-info page of the app.</div>
+
+        <div class="script-quote agent"><strong>Immediate coverage:</strong> "As soon as you make your first contribution you're covered day 1 — no 2-year wait period like most carriers!"</div>
+        <div class="script-quote agent"><strong>Locked in:</strong> "Premium never increases and coverage never decreases!"</div>
+        <div class="script-quote agent"><strong>Tax-free:</strong> "The death benefit, living benefit, and cash value are one of the few things we don't have to pay Uncle Sam for!" <em>(chuckle)</em></div>
+        <div class="script-quote agent"><strong>Living benefit:</strong> "This one is important — IF you get a terminal illness and the doctor tells you that you have a few years to live, you'll have access to 100% of the benefit tax-free while you're still living! Isn't that awesome, <strong>(CLIENT NAME)</strong>?"</div>
+        <div class="script-quote agent"><strong>Cash value:</strong> "Your policy will accumulate cash value over time."</div>
+        <div class="script-quote agent"><strong>Double Accidental Payout:</strong> "If your cause of death is choke, drown, slip, fall, or a car accident, your coverage would double. It's an accidental rider built into your policy."</div>
+        <div class="script-quote agent"><strong>Permanent coverage:</strong> "Lastly, this coverage will never expire on you — it is a whole-life policy."</div>
+      </section>
+
+      <!-- QUOTE -->
+      <section class="script-section" id="s-quote">
+        <div class="script-section-label"><span class="pill">09</span> Quote & Lock the Premium</div>
+        <div class="script-tip"><strong>Pricing reference</strong>Burial $7,000 – $15,000 · Cremation $2,000 – $5,000. <strong>Always quote higher to lower</strong> if needed.</div>
+        <div class="script-quote agent">"Do you want to cover a <strong>burial</strong> or <strong>cremation</strong>?"</div>
+        <div class="script-quote agent">
+          "This will cover the full burial / cremation and make sure <strong>(BENEFICIARY NAME)</strong> is taken care of — they don't have to pay for anything. It also includes a ceremony and provides a cushion for any income loss.<br><br>
+          It was supposed to cost you <strong>$XXX</strong>, but since you are a Widow of a Veteran your contribution will only be <strong>$XXX</strong>…"
+        </div>
+        <div class="script-action">Continue to GREEN — <strong>no pause</strong>. "Now that sounds a lot better."</div>
+        <div class="script-pushback">
+          <span class="label">Push Back #1 — "Oh, that's too much"</span>
+          "Now the only thing left to do is to see if you are healthy enough to get approved today."
+        </div>
+        <div class="script-quote agent">"Perfect. Now we'll send in a request for coverage and hope to get the approval. Keep in mind they don't approve of everyone, but I will do my best to get you the coverage, okay?"</div>
+      </section>
+
+      <!-- BANKING -->
+      <section class="script-section" id="s-bank">
+        <div class="script-section-label action"><span class="pill">10</span> Banking · Immediate Draft</div>
+        <div class="script-tip"><strong>Use only if leftover income is high ($500+)</strong>"If the policy is to be approved, would you like to be covered right away like most Widows?"</div>
+
+        <h3 class="script-sub">How to ask for banking</h3>
+        <div class="script-quote agent">"Okay perfect, we'll set up the initial payment <strong>(on the date you discussed)</strong>."</div>
+        <div class="script-quote agent">"Who do you bank with?"</div>
+        <div class="script-action">Google that bank/state's routing number, read it off to them, then ask for the account #. <strong>Make them repeat it twice.</strong> Then: "Is this a checking or savings account?"</div>
+        <div class="script-quote agent">"Perfect — give me one moment while the system verifies that information is linked to your name, for your safety and the safety of others."</div>
+
+        <h3 class="script-sub">No checkbook path</h3>
+        <ul class="script-bullets">
+          <li>Q1 — Do you get your statements via mail or email?</li>
+          <li>Q2 — Do you do online banking?</li>
+        </ul>
+        <div class="script-action"><strong>CHECKMATE</strong> — If they have no checkbook AND can't find a bank statement AND can't find the account #: "No worries, we can just add the debit card on file for now and update it later. Go ahead with the card you want to put on file." Ask Visa / Mastercard, write down card number, expiration month/year, CVV. Make them repeat it twice. <strong>Then pivot to AIG SIWL.</strong> Write down all info and proceed with the app.</div>
+
+        <h3 class="script-sub">Bank Objections</h3>
+        <div class="script-pushback">
+          <span class="label">Push Back #1</span>
+          "I completely understand. Now, quick question, <strong>(Client's Name)</strong> — have you ever given or received a check from anyone in your lifetime? Perfect. If you notice at the bottom of every check, you'll see the bank's routing and account number — because that information <em>can't</em> be used to buy something online or go to your local Walmart and go on a shopping spree, okay? What would be weird is if I'd asked you for something like a debit / credit card, which is an unsecured payment method. Does that make sense? Go ahead with your account number."
+        </div>
+        <div class="script-pushback">
+          <span class="label">Push Back #2 — "Why do I have to give you that banking information now?"</span>
+          "I completely understand. The state is required by law to validate that the information provided is linked to your name, for your safety and the safety of others.<br><br>
+          Do you receive text messages to this phone? I'm going to send you a picture of my screen for further transparency."
+        </div>
+        <div class="script-action">Send a pic of the application with carrier name and their name.</div>
+        <div class="script-quote agent">"Do you see your name there? And the name of the carrier on the screen? Now, when you are ready with that information…"</div>
+        <div class="script-tip"><strong>Have them do it!</strong>Or teach them how.</div>
+      </section>
+
+      <!-- LOCK CLOSE -->
+      <section class="script-section" id="s-close">
+        <div class="script-section-label"><span class="pill">11</span> Locking Down the Close</div>
+        <div class="script-quote agent">
+          "So <strong>(Client Name)</strong>, I've got good news — everything has been approved and you're all set.<br><br>
+          Just to recap real quick: the coverage is <strong>$XXX</strong> with <strong>XXX</strong> as the carrier. Your policy will arrive in the mail in about 10–12 business days.<br><br>
+          The number we're speaking on right now is my direct line. If you ever have a question, need help, or just want something explained again, please don't hesitate to call or text me. That's exactly what I'm here for.<br><br>
+          I also want to say this — the reason so many people choose to do this is because it brings peace of mind. You've taken a moment today to make sure your family won't be left guessing or struggling later on. That's a very loving and responsible thing to do, and it really does matter.<br><br>
+          One small thing to be aware of: once a policy is approved, we notify the state Department of Insurance, which helps reduce unwanted calls about this coverage. The only people who should ever contact you about your policy are me or the insurance company. If anyone else calls and says something doesn't sound right, just give me a call — I'll take care of it for you.<br><br>
+          Before we hang up — do you feel good about the decision you made today for yourself and your family?<br><br>
+          I truly appreciate you trusting me, <strong>(Client Name)</strong>. You did a good thing today. Enjoy the rest of your day, and please take care."
+        </div>
+      </section>
+
+      <!-- INTRO OBJECTIONS -->
+      <section class="script-section" id="s-obj1">
+        <div class="script-section-label objection"><span class="pill">12</span> Phase I · Intro Objections</div>
+
+        <div class="script-quote customer">"Looking for benefits!"</div>
+        <div class="script-pushback">
+          "Perfect, sir. This is a new program as part of your Veteran Benefits that gives you access to an exclusive discounted rate for your final expense and life options. Do you currently have anything in place?"
+          <div class="script-cue">Then go back to the script.</div>
+        </div>
+
+        <div class="script-quote customer">"When I pass away, the VA will take care of my burial." <em>(Veterans often think they're buried for free.)</em></div>
+        <div class="script-pushback">
+          "I completely understand, but that's actually a common misconception. I wish that were the case — if it were up to me, all veterans would get put to rest at no cost! But unfortunately, too many veterans don't know what the VA actually covers when they pass away. The VA covers your plot, but your loved ones would be responsible for your burial / cremation.<br><br>
+          That being said — God forbid something happened to you today, who would be responsible for the funeral expenses and picking up all the pieces tomorrow?"
+          <div class="script-cue">Then go back to the script.</div>
+        </div>
+        <div class="script-tip"><strong>Reference</strong>benefits.va.gov/compensation/claims-special-burial.asp</div>
+
+        <div class="script-quote customer">"I don't remember filling this out!"</div>
+        <div class="script-pushback">
+          "Perfect — I usually don't remember what I eat for breakfast most days. You put your date of birth as ___, correct?<br><br>
+          Most people's main concern when they fill this out is to make sure that their final expense doesn't fall as a burden on their loved ones, or to leave some extra money behind. Do you currently have anything in place?"
+          <div class="script-cue">Then go back to the script.</div>
+        </div>
+
+        <div class="script-quote customer">"I'm not interested!"</div>
+        <div class="script-pushback">
+          "I completely understand. When you sent this request in, what was your main concern? Do you have any coverage currently in place to pay for your burial or cremation?<br><br>
+          <em>If yes:</em> Perfect — when you sent this in, were you just trying to save some money with the new discounted programs, or add more coverage?"
+          <div class="script-cue">Then go back to the script.</div>
+        </div>
+
+        <div class="script-quote customer">"This is not a good time / I'm busy!"</div>
+        <div class="script-pushback">
+          "<strong>(Client name)</strong>, perfect — we are really backed up too! I'll make this quick for you. You put your date of birth as ___, correct?"
+          <div class="script-cue">Then go back to the script.</div>
+        </div>
+        <div class="script-tip"><strong>For agent</strong>Only if they are driving or at work, don't proceed the call. Ask for the best time to reach them. Ask if they were wanting to focus on burial or cremation before ending the call.</div>
+      </section>
+
+      <!-- NUMBERS OBJECTIONS -->
+      <section class="script-section" id="s-obj2">
+        <div class="script-section-label objection"><span class="pill">13</span> Phase II · Numbers Objections</div>
+
+        <div class="script-quote customer">"Can you send it in the mail?"</div>
+        <div class="script-pushback">
+          "I completely understand that you want it sent in the mail, but this isn't something where you see it, like it, and buy it. We would need to submit the request for coverage and hope to get the approval. So given these three options, which one makes the most sense for you — the <strong>gold</strong>, <strong>silver</strong>, or <strong>bronze</strong>?"
+        </div>
+
+        <div class="script-quote customer">"I need to think about it!"</div>
+        <div class="script-pushback">
+          "I completely understand. Did you want to think about <em>if</em> you needed the coverage at all, or <em>which</em> coverage amount you should go with?"
+        </div>
+        <div class="script-pushback">
+          <span class="label">If "which one"</span>
+          "Let's start with the bare minimum — make sure you can get the approval and foot in the door, and that it's comfortable and affordable. Then we can always increase it in the future. Does that make sense? So to get started on the app…"
+          <div class="script-cue">Proceed to script.</div>
+        </div>
+        <div class="script-pushback">
+          <span class="label">If "don't need"</span>
+          "Spin back on <em>why</em>. Do they have any insurance? Any money saved up? If yes, is it enough?" <em>(10k isn't enough for burial; most add 5k to factor in inflation.)</em><br><br>
+          Challenge: "Do you mind if I make a recommendation?"
+        </div>
+
+        <div class="script-quote customer">"I need to talk to my wife about this!"</div>
+        <div class="script-pushback">
+          <span class="label">Push Back #1</span>
+          "I completely understand. She is the beneficiary of the plan and she has to know what's going on — you can't keep this a secret, that's for sure. Do you need to talk to her about <em>which one</em> to go with, or <em>if you should even do this</em>, because you said this was to protect her, correct?"
+        </div>
+        <div class="script-pushback">
+          <span class="label">Push Back #2</span>
+          "<strong>(Client name)</strong>, do you mind if I make a recommendation? Now, we can both agree that accidents can occur at any time, correct? If something happened to you while driving on the way home tomorrow… and you had put this protection in place for your wife on possibly her worst day — do you think she would be mad at you?"
+        </div>
+
+        <h3 class="script-sub">Bank Objections (repeat)</h3>
+        <div class="script-pushback">
+          <span class="label">Push Back #1</span>
+          "I completely understand. Now, quick question, <strong>(Client's Name)</strong> — have you ever given or received a check from anyone in your lifetime? Perfect. If you notice at the bottom of every check, you'll see the bank's routing and account number — because that information can't be used to buy something online or go to your local Walmart and go on a shopping spree, okay? What would be weird is if I'd asked you for something like a debit / credit card, which is an unsecured payment method. Does that make sense? Go ahead with your account number."
+        </div>
+        <div class="script-pushback">
+          <span class="label">Push Back #2 — "Why do I have to give you that banking information now?"</span>
+          "I completely understand. The state is required by law to validate that the information provided is linked to your name, for your safety and the safety of others.<br><br>
+          Do you receive text messages to this phone? I'm going to send you a picture of my screen for further transparency."
+        </div>
+        <div class="script-action">Send a pic of the application with carrier name and their name.</div>
+        <div class="script-quote agent">"Do you see your name there? And the name of the carrier on the screen? Now, when you are ready with that information…"</div>
+      </section>
+
+      <!-- VA PROGRAMS -->
+      <section class="script-section" id="s-va">
+        <div class="script-section-label va"><span class="pill">14</span> VA Programs · Agent Homework</div>
+        <p class="script-intro">Drop these into the conversation to build trust and demonstrate you know what's available for them.</p>
+        <ul class="script-va-list">
+          <li><span class="star">★</span><strong>VA Healthcare</strong><span class="what">— medical coverage through VA facilities</span></li>
+          <li><span class="star">★</span><strong>Disability Compensation Annual Increase</strong><span class="what">— yearly COLA bumps to monthly compensation</span></li>
+          <li><span class="star">★</span><strong>Aid &amp; Attendance</strong><span class="what">— monthly add-on for help with daily living</span></li>
+          <li><span class="star">★</span><strong>DIC</strong><span class="what">— Dependency &amp; Indemnity Compensation for survivors</span></li>
+          <li><span class="star">★</span><strong>CHAMPVA</strong><span class="what">— health coverage for eligible spouses / children</span></li>
+          <li><span class="star">★</span><strong>VA Survivor Pension for Widows</strong><span class="what">— income-based pension for low-income surviving spouses</span></li>
+        </ul>
+      </section>
+
+    </div>
+  </aside>
 
   <div class="toast" id="toast"></div>
 
@@ -2173,6 +2877,71 @@
       if (e.key === 'Enter')  { e.preventDefault(); return keypadCall(); }
       if (e.key === 'Backspace') { e.preventDefault(); return keypadBackspace(); }
       if (/^[0-9*#+]$/.test(e.key)) { e.preventDefault(); return keypadPress(e.key); }
+    });
+
+    // ── Call script drawer ──────────────────────────────────
+    function openScript() {
+      const drawer = document.getElementById('script-drawer');
+      drawer.classList.add('open');
+      drawer.setAttribute('aria-hidden', 'false');
+      // Default the first nav button to active on first open
+      if (!document.querySelector('#script-nav button.active')) {
+        const first = document.querySelector('#script-nav button');
+        if (first) first.classList.add('active');
+      }
+    }
+
+    function closeScript() {
+      const drawer = document.getElementById('script-drawer');
+      drawer.classList.remove('open');
+      drawer.setAttribute('aria-hidden', 'true');
+    }
+
+    function toggleScript() {
+      const drawer = document.getElementById('script-drawer');
+      if (drawer.classList.contains('open')) closeScript();
+      else openScript();
+    }
+
+    function scrollScript(targetId) {
+      const body = document.getElementById('script-body');
+      const target = document.getElementById(targetId);
+      if (!body || !target) return;
+      const top = target.offsetTop - body.offsetTop - 8;
+      body.scrollTo({ top, behavior: 'smooth' });
+
+      document.querySelectorAll('#script-nav button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.target === targetId);
+      });
+    }
+
+    // Highlight nav as user scrolls through sections
+    (function wireScriptScrollSpy() {
+      const body = document.getElementById('script-body');
+      if (!body) return;
+      const sections = Array.from(body.querySelectorAll('.script-section'));
+      body.addEventListener('scroll', () => {
+        const offset = body.scrollTop + 40;
+        let current = sections[0];
+        for (const s of sections) {
+          if (s.offsetTop - body.offsetTop <= offset) current = s;
+        }
+        if (current) {
+          document.querySelectorAll('#script-nav button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.target === current.id);
+          });
+        }
+      }, { passive: true });
+    })();
+
+    document.addEventListener('keydown', e => {
+      if (e.altKey && (e.key === 's' || e.key === 'S')) {
+        e.preventDefault();
+        return toggleScript();
+      }
+      if (e.key === 'Escape' && document.getElementById('script-drawer').classList.contains('open')) {
+        return closeScript();
+      }
     });
 
     function onDragOver(e) {
