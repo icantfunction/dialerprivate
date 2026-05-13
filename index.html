@@ -1785,11 +1785,11 @@
         connect.core.initCCP(document.getElementById('ccp-container'), {
           ccpUrl,
           loginPopup: true,
-          loginPopupAutoClose: true,
-          loginOptions: { autoClose: true, height: 600, width: 400 },
+          loginPopupAutoClose: false,
+          loginOptions: { autoClose: false, height: 700, width: 460 },
           softphone: { allowFramedSoftphone: true, disableRingtone: false },
           pageOptions: {
-            enableAudioDeviceSettings: false,
+            enableAudioDeviceSettings: true,
             enablePhoneTypeSettings: false,
           },
         });
