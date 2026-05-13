@@ -1250,8 +1250,10 @@
       gap: 10px;
       min-width: 280px;
       box-shadow: 0 22px 60px oklch(0% 0 0 / 0.40);
-      pointer-events: auto;
+      pointer-events: none;
     }
+
+    .call-overlay.active .call-card { pointer-events: auto; }
 
     .ring-wrap {
       position: relative;
