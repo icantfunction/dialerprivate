@@ -2200,6 +2200,10 @@
       runtimeConfig.callStopApi ||
       window.CALL_STOP_API ||
       `${CALL_API.replace(/\/$/, '')}/stop`;
+    const CALL_STATUS_API =
+      runtimeConfig.callStatusApi ||
+      window.CALL_STATUS_API ||
+      `${CALL_API.replace(/\/$/, '')}/status`;
 
     let contacts = [];
     let selected = null;
@@ -2702,6 +2706,76 @@
       }
     }
 
+    // Poll Connect for the contact stage so we know the moment the customer
+    // leg is up (human or voicemail) — not just when the agent CCP bridges.
+    // Stops the synthesized ringback and updates the status label.
+    let callStatusPoll = null;
+
+    function startCallStatusPolling(contactId) {
+      stopCallStatusPolling();
+      if (!contactId) return;
+      let stopped = false;
+      let attempts = 0;
+
+      const tick = async () => {
+        if (stopped) return;
+        attempts++;
+        // Hard cap: 60 polls × 1.5s ≈ 90s. Stop ringback too — by now we've
+        // either lost the contact or Connect isn't progressing it.
+        if (attempts > 60) {
+          stopRingback();
+          stopped = true;
+          stopCallStatusPolling();
+          return;
+        }
+        try {
+          const res = await fetch(`${CALL_STATUS_API}?contactId=${encodeURIComponent(contactId)}`);
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(data.message || `status ${res.status}`);
+
+          const lbl = document.getElementById('call-status-label');
+          if (data.stage === 'pending' || data.stage === 'initiated') {
+            // still dialing the customer; ringback keeps playing
+          } else if (data.customerAnswered) {
+            stopRingback();
+            if (lbl) {
+              if (data.stage === 'on_agent') lbl.textContent = 'Connected';
+              else lbl.textContent = data.amd === 'VOICEMAIL_BEEP' || data.amd === 'VOICEMAIL_NO_BEEP'
+                ? 'Voicemail · waiting for agent'
+                : 'Customer answered · routing…';
+            }
+            // Once the customer is up we stop ringback, but keep polling
+            // a bit longer so we can flip the label to "Connected" when
+            // the agent leg actually bridges.
+            if (data.stage === 'on_agent' || data.stage === 'ended') {
+              stopped = true;
+              stopCallStatusPolling();
+            }
+          } else if (data.stage === 'ended') {
+            stopRingback();
+            stopped = true;
+            stopCallStatusPolling();
+            if (lbl) lbl.textContent = 'Call ended';
+          }
+        } catch (err) {
+          console.warn('Status poll failed:', err.message);
+          if (attempts >= 5) {
+            stopped = true;
+            stopCallStatusPolling();
+          }
+        }
+      };
+
+      // First check fast (~600ms) to catch quick voicemail pickups, then 1.5s
+      setTimeout(tick, 600);
+      callStatusPoll = setInterval(tick, 1500);
+    }
+
+    function stopCallStatusPolling() {
+      if (callStatusPoll) clearInterval(callStatusPoll);
+      callStatusPoll = null;
+    }
+
     function startCallTimer() {
       clearTimeout(connectDelayTimeout);
       clearInterval(timerInterval);
@@ -2756,6 +2830,7 @@
           simulated: false
         };
         document.getElementById('call-status-label').textContent = 'Connecting via AWS Connect…';
+        startCallStatusPolling(result.contactId);
       } else {
         activeCall = { contactId: null, sourcePhoneNumber: '', simulated: true };
         document.getElementById('call-status-label').textContent = 'Simulated call';
@@ -2768,6 +2843,7 @@
     async function endCall() {
       const contactIdToStop = activeCall?.contactId || null;
       stopRingback();
+      stopCallStatusPolling();
       document.getElementById('call-overlay').classList.remove('active');
       clearInterval(timerInterval);
       clearTimeout(connectDelayTimeout);

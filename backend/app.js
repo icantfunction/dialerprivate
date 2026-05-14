@@ -7,6 +7,7 @@ import {
   ConnectClient,
   StartOutboundVoiceContactCommand,
   StopContactCommand,
+  DescribeContactCommand,
 } from '@aws-sdk/client-connect';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -130,6 +131,65 @@ export function createApp({ serveStatic = false } = {}) {
       res.status(502).json({
         error: error.name || 'CallFailed',
         message: error.message || 'Failed to start outbound voice contact.',
+      });
+    }
+  });
+
+  app.get('/api/call/status', async (req, res) => {
+    if (!ensureConfigured(res)) return;
+
+    const contactId = String(req.query?.contactId || '').trim();
+    if (!contactId) {
+      res.status(400).json({
+        error: 'MissingContactId',
+        message: 'contactId query parameter is required.',
+      });
+      return;
+    }
+
+    try {
+      const out = await connect.send(new DescribeContactCommand({
+        InstanceId: config.instanceId,
+        ContactId: contactId,
+      }));
+      const c = out.Contact || {};
+      const agentInfo = c.AgentInfo || {};
+      const queueInfo = c.QueueInfo || {};
+
+      // Infer stage from timestamps. Order matters — `ended` wins.
+      let stage = 'initiated';
+      if (c.DisconnectTimestamp) stage = 'ended';
+      else if (agentInfo.ConnectedToAgentTimestamp) stage = 'on_agent';
+      else if (queueInfo.EnqueueTimestamp) stage = 'in_queue';
+
+      // Customer leg is "up" once the contact flow advanced past dialing.
+      // EnqueueTimestamp means the flow reached Transfer to queue (customer
+      // answered, human or VM). ConnectedToAgentTimestamp means bridged.
+      const customerAnswered = !!(queueInfo.EnqueueTimestamp || agentInfo.ConnectedToAgentTimestamp);
+
+      res.json({
+        ok: true,
+        contactId,
+        stage,
+        customerAnswered,
+        amd: c.AnsweringMachineDetectionStatus || null,
+        initiationTimestamp:         c.InitiationTimestamp         || null,
+        enqueueTimestamp:            queueInfo.EnqueueTimestamp    || null,
+        connectedToAgentTimestamp:   agentInfo.ConnectedToAgentTimestamp || null,
+        disconnectTimestamp:         c.DisconnectTimestamp         || null,
+        disconnectReason:            c.DisconnectReason            || null,
+      });
+    } catch (error) {
+      // 404 on not-yet-indexed contacts is common in the first ~1s; surface
+      // it as a soft `pending` instead of an error so the client can retry.
+      if (error.name === 'ResourceNotFoundException') {
+        res.json({ ok: true, contactId, stage: 'pending', customerAnswered: false });
+        return;
+      }
+      console.error('Connect describe contact error:', error);
+      res.status(502).json({
+        error: error.name || 'DescribeContactFailed',
+        message: error.message || 'Failed to describe contact.',
       });
     }
   });
